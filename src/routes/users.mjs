@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { query, checkSchema, validationResult, body, matchedData } from "express-validator";
 import { filterValidationSchema, createuserValidationSchema, IDvalidatie, updateUserValidationSchema } from "../utils/validationschemas.mjs"
-import { userCreationLimiter} from "../utils/middelwares.mjs";
+import { resultValidator, userCreationLimiter} from "../utils/middelwares.mjs";
 import pool from "../postgress/db.mjs";
 
 
@@ -14,61 +14,46 @@ const router = Router();
 
 
 // GET request voor het ophalen van alle gebruikers of met een filter.
-router.get('/api/users', checkSchema(filterValidationSchema), async (request, response) => {
-    
-    // Validatie van de request body aan de hand van het gedefinieerde schema
-    const result = validationResult(request);// result bevat de resultaten van de validatie.
-    if (!result.isEmpty()) {// Als de validatieresultaten niet leeg zijn oftewel er zijn fouten in de validatie van de invoer dan 400 error
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors});// errors result.array is de lijst met fouten uit de result wordt weergegeven in een array
-    }
-
+router.get('/api/users', checkSchema(filterValidationSchema), resultValidator, async (request, response) => {
     const { query: { filter, value } } = request; // Haalt 'filter' en 'value' op uit de query parameters van de request
 
     try {
+        const allowedFilters = ['email', 'phone', 'lastname', 'firstname', 'country', 'postalcode', 'housenumber']; // Lijst van toegestane filters
 
-    const allowedFilters = ['email', 'phone', 'lastname', 'firstname', 'country', 'postalcode', 'housenumber']; // Lijst van toegestane filters (veldnamen), die veilig gebruikt kunnen worden in de query
-    if (filter && !allowedFilters.includes(filter)) { // Controleer of het filter geldig is
-        return response.status(400).send({ error: 'Invalid filter' }); // Stuur een foutmelding als het filter niet in de lijst van toegestane filters zit
-    };
+        // Controleer of het filter geldig is
+        if (filter && !allowedFilters.includes(filter)) {
+            return response.status(400).send({ error: 'Invalid filter' });
+        }
 
-    let users;
-    if (filter && value) { // Als zowel een filter als een waarde is opgegeven in de query
-        const sql = `SELECT * FROM users WHERE ?? LIKE ?`; // SQL-query die zoekt naar gebruikers waar het filter overeenkomt met de waarde
-        const params = [filter, `%${value}%`]; // De parameters voor de query (filternaam en waarde, waarbij waarde wordt omgeven door % voor een LIKE-zoekopdracht)
-        [users] = await pool.query(sql, params); // Voer de query uit en sla het resultaat op in 'users'
-    } else {
-        [users] = await pool.query('SELECT * FROM users'); // Als geen filter is opgegeven, haal dan alle gebruikers op uit de database
-    };
+        let users;
 
-    return response.json(users); // Retourneer de lijst van gebruikers als JSON
+        if (filter && value) {
+            // SQL-query met filter en waarde
+            const sql = `SELECT * FROM users WHERE ?? LIKE ?`;
+            const params = [filter, `%${value}%`];
+            [users] = await pool.query(sql, params); // Voer de query uit
+        }
 
-} catch (err) {
-    console.error('Database error:', err); // Log de fout als er iets misgaat met de database
-    return response.status(500).send('Server error'); // Stuur een serverfoutmelding terug als er een probleem is met de databasequery
-};
+        // Als geen resultaten gevonden worden, haal alle gebruikers op
+        if (!users || users.length === 0) {
+            [users] = await pool.query('SELECT * FROM users');
+        }
 
+        // Retourneer de gebruikers
+        return response.json(users);
+
+    } catch (err) {
+        console.error('Database error:', err.message);
+        return response.status(500).send('Server error'); // Stuur een serverfoutmelding terug
+    }
 });
 
 
 
 
-// POST request voor het aanmaken van een nieuwe gebruiker
-router.post('/api/users', userCreationLimiter, checkSchema(createuserValidationSchema), async (request, response) => {
-    
-    // Validatie van de request body aan de hand van het gedefinieerde schema
-    const result = validationResult(request); // result bevat de resultaten van de validatie. 
-    if (!result.isEmpty()) { // Als de validatieresultaten niet leeg zijn oftewel er zijn fouten in de validatie van de invoer dan 400 error
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors}); // errors result.array is de lijst met fouten uit de result wordt weergegeven in een array
-    }
 
+// POST request voor het aanmaken van een nieuwe gebruiker
+router.post('/api/users', userCreationLimiter, checkSchema(createuserValidationSchema), resultValidator, async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
 
@@ -115,19 +100,7 @@ router.post('/api/users', userCreationLimiter, checkSchema(createuserValidationS
 
 
 // Ophalen van users aan de hand van id
-router.get('/api/users/:id', checkSchema(IDvalidatie), async (request, response) => {
-
-    // Validatie van de request body aan de hand van het gedefinieerde schema
-    const result = validationResult(request);
-    if (!result.isEmpty()) {
-        // Formatteren van fouten voor consistente en nette foutmeldingen
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).json({ errors: formattedErrors});
-    }
-
+router.get('/api/users/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     // Gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
     const UserID = data.id;
@@ -153,18 +126,7 @@ router.get('/api/users/:id', checkSchema(IDvalidatie), async (request, response)
 
 
 // put request 
-router.put ('/api/users/:id', checkSchema(createuserValidationSchema),  checkSchema(IDvalidatie), async (request, response) => {
-
-        // Validatie van de request body aan de hand van het gedefinieerde schema
-    const result = validationResult(request); // result bevat de resultaten van de validatie. 
-    if (!result.isEmpty()) { // Als de validatieresultaten niet leeg zijn oftewel er zijn fouten in de validatie van de invoer dan 400 error
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors}); // errors result.array is de lijst met fouten uit de result wordt weergegeven in een array
-    }
-
+router.put ('/api/users/:id', checkSchema(createuserValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
     const UserID = request.params.id;
@@ -192,18 +154,7 @@ router.put ('/api/users/:id', checkSchema(createuserValidationSchema),  checkSch
 
 
 // patch request voor het aanpassen van een of meerdere gegevens in een bestand.
-router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkSchema(IDvalidatie), async (request, response) => {
-
-    // Validatie van de request body aan de hand van het gedefinieerde schema
-    const result = validationResult(request); // result bevat de resultaten van de validatie. 
-    if (!result.isEmpty()) { // Als de validatieresultaten niet leeg zijn oftewel er zijn fouten in de validatie van de invoer dan 400 error
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors}); // errors result.array is de lijst met fouten uit de result wordt weergegeven in een array
-    }
-
+router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
     const UserID = request.params.id;
@@ -295,18 +246,7 @@ router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkS
 
 
 // delete request voor het verwijderen van een user in dit geval.
-router.delete ('/api/users/:id', checkSchema(IDvalidatie), async (request, response) => {
-
-    // Validatie van de request body aan de hand van het gedefinieerde schema
-    const result = validationResult(request);
-    if (!result.isEmpty()) {
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).json({ errors: formattedErrors });
-    }
-
+router.delete ('/api/users/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     const data = matchedData(request); 
     const UserID = data.id;
 

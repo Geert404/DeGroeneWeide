@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { query, checkSchema, validationResult, body, matchedData } from "express-validator";
 import { filterValidationSchema, createuserValidationSchema, IDvalidatie, updateUserValidationSchema, BookingValidation, emailvalidator } from "../utils/validationschemas.mjs"
-import { userCreationLimiter} from "../utils/middelwares.mjs";
+import { resultValidator, userCreationLimiter} from "../utils/middelwares.mjs";
 import pool from "../postgress/db.mjs";
 import { mapBookingData } from "../utils/response.mjs";
 
@@ -14,17 +14,7 @@ const router = Router();
 
 
 
-router.post('/api/bookings/', checkSchema(BookingValidation), async (request, response) => {
-    // Validatie van de request body aan de hand van het gedefinieerde schema
-    const result = validationResult(request); // result bevat de resultaten van de validatie. 
-    if (!result.isEmpty()) { // Als de validatieresultaten niet leeg zijn oftewel er zijn fouten in de validatie van de invoer dan 400 error
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors}); // errors result.array is de lijst met fouten uit de result wordt weergegeven in een array
-    }
-
+router.post('/api/bookings/', checkSchema(BookingValidation), resultValidator, async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
 
@@ -104,17 +94,7 @@ router.post('/api/bookings/', checkSchema(BookingValidation), async (request, re
 
 
 
-router.get('/api/bookings',checkSchema(emailvalidator), async (request, response) => {
-        // Validatie van de request body aan de hand van het gedefinieerde schema
-    const result = validationResult(request); // result bevat de resultaten van de validatie. 
-    if (!result.isEmpty()) { // Als de validatieresultaten niet leeg zijn oftewel er zijn fouten in de validatie van de invoer dan 400 error
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors}); // errors result.array is de lijst met fouten uit de result wordt weergegeven in een array
-    }
-
+router.get('/api/bookings',checkSchema(emailvalidator), resultValidator, async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request);
 
@@ -151,16 +131,7 @@ router.get('/api/bookings',checkSchema(emailvalidator), async (request, response
 
 
 
-router.delete('/api/bookings/:id', checkSchema(IDvalidatie), async (request, response) => {
-    const result = validationResult(request); // result bevat de resultaten van de validatie. 
-    if (!result.isEmpty()) { // Als de validatieresultaten niet leeg zijn oftewel er zijn fouten in de validatie van de invoer dan 400 error
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors}); // errors result.array is de lijst met fouten uit de result wordt weergegeven in een array
-    }
-
+router.delete('/api/bookings/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request);
     const BookingID = data.id;

@@ -2,6 +2,7 @@ import { response, Router } from "express";
 import { checkSchema, matchedData, validationResult } from "express-validator";
 import pool from "../postgress/db.mjs";
 import { productValidationSchema, IDvalidatie, filterValidationSchema } from "../utils/validationschemas.mjs";
+import { resultValidator } from "../utils/middelwares.mjs";
 
 const router = Router();
 
@@ -49,18 +50,7 @@ const router = Router();
  *         description: Serverfout
  */
 
-
-
-router.post('/api/products', checkSchema(productValidationSchema), async (request, response) => {
-    const result = validationResult(request);
-    if (!result.isEmpty()) {
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors });
-    }
-
+router.post('/api/products', checkSchema(productValidationSchema), resultValidator, async (request, response) => {
     const data = matchedData(request); 
 
     try {
@@ -211,16 +201,7 @@ router.get('/api/products', async (request, response) => {
  *         description: Serverfout
  */
 
-router.get('/api/products/:id', checkSchema(IDvalidatie), async (request, response) => {
-    const result = validationResult(request);
-    if (!result.isEmpty()) {
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).json({ errors: formattedErrors });
-    }
-    
+router.get('/api/products/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     const data = matchedData(request); 
     const productID = data.id;
     
@@ -260,16 +241,7 @@ router.get('/api/products/:id', checkSchema(IDvalidatie), async (request, respon
  *         description: Serverfout.
  */
 
-router.delete('/api/products/:id', checkSchema(IDvalidatie), async (request, response) => {
-    const result = validationResult(request); 
-    if (!result.isEmpty()) {
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors});
-    }
-
+router.delete('/api/products/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     const data = matchedData(request);
     const productID = data.id;
     try {
