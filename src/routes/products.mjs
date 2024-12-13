@@ -10,6 +10,8 @@ const router = Router();
  * @swagger
  * /api/products:
  *   post:
+ *     tags:
+ *       - products
  *     description: Voeg een nieuw product toe.
  *     requestBody:
  *       required: true
@@ -93,6 +95,8 @@ router.post('/api/products', checkSchema(productValidationSchema), resultValidat
  * @swagger
  * /api/products:
  *   get:
+ *     tags:
+ *       - products
  *     description: Haal alle producten op.
  *     responses:
  *       200:
@@ -151,6 +155,8 @@ router.get('/api/products', async (request, response) => {
  * @swagger
  * /api/products/{id}:
  *   get:
+ *     tags:
+ *       - products
  *     description: Haal een product op op basis van ID.
  *     parameters:
  *       - in: path
@@ -223,6 +229,8 @@ router.get('/api/products/:id', checkSchema(IDvalidatie), resultValidator, async
  * @swagger
  * /api/products/{id}:
  *   delete:
+ *     tags:
+ *       - products
  *     description: Verwijder een product op basis van ID.
  *     parameters:
  *       - in: path

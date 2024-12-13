@@ -10,6 +10,8 @@ const router = Router();
  * @swagger
  * /api/categories:
  *   post:
+ *     tags:
+ *       - categories
  *     description: maakt een nieuwe categorie aan.
  *     requestBody:
  *       required: true
@@ -60,6 +62,8 @@ router.post('/api/categories', checkSchema(categoryValidationSchema), resultVali
  * @swagger
  * /api/categories:
  *   get:
+ *     tags:
+ *       - categories
  *     description: Ophalen van alle categorieen.
  *     responses:
  *       200:
@@ -86,6 +90,8 @@ router.get('/api/categories', async (request, response) => {
  * @swagger
  * /api/categories/{id}:
  *   get:
+ *     tags:
+ *       - categories
  *     description: Ophalen van alle producten aan de hand van category ID.
  *     parameters:
  *       - in: path
@@ -127,6 +133,8 @@ router.get('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, asy
  * @swagger
  * /api/categories/{id}:
  *   delete:
+ *     tags:
+ *       - categories
  *     description: verwijderen van categorie aan de hand van ID.
  *     parameters:
  *       - in: path

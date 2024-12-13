@@ -12,6 +12,91 @@ const router = Router();
 
 
 
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Haal gebruikers op met of zonder filters
+ *     description: |
+ *       Dit endpoint haalt een lijst van gebruikers op. Je kunt optioneel een filter en waarde meegeven om specifieke gebruikers op te halen. Als geen filters worden meegegeven, retourneert het endpoint alle gebruikers.
+ *     parameters:
+ *       - name: filter
+ *         in: query
+ *         description: Het veld waarop je wilt filteren (bijv. email, phone, lastname, etc.).
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum:
+ *             - email
+ *             - phone
+ *             - lastname
+ *             - firstname
+ *             - country
+ *             - postalcode
+ *             - housenumber
+ *       - name: value
+ *         in: query
+ *         description: De waarde waarmee je wilt filteren (bijv. een specifieke email of naam).
+ *         required: false
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Een lijst van gebruikers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   UserID:
+ *                     type: integer
+ *                     example: 1
+ *                   Email:
+ *                     type: string
+ *                     example: jurgen@gmail.com
+ *                   Phone:
+ *                     type: string
+ *                     example: "1234567890"
+ *                   Firstname:
+ *                     type: string
+ *                     example: Jurgen
+ *                   Lastname:
+ *                     type: string
+ *                     example: Doe
+ *                   Housenumber:
+ *                     type: integer
+ *                     example: 5
+ *                   Streetname:
+ *                     type: string
+ *                     example: Main Street
+ *                   Postalcode:
+ *                     type: string
+ *                     example: 12345
+ *                   Country:
+ *                     type: string
+ *                     example: Netherlands
+ *       400:
+ *         description: Ongeldig filter of ontbrekende waarde
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid filter
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: Server error
+ */
 
 // GET request voor het ophalen van alle gebruikers of met een filter.
 router.get('/api/users', checkSchema(filterValidationSchema), resultValidator, async (request, response) => {
@@ -51,6 +136,112 @@ router.get('/api/users', checkSchema(filterValidationSchema), resultValidator, a
 
 
 
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     tags:
+ *       - Users
+ *     summary: Maak een nieuwe gebruiker aan
+ *     description: |
+ *       Dit endpoint maakt een nieuwe gebruiker aan in de database. Controleert eerst of het opgegeven e-mailadres al bestaat.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - phone
+ *               - firstname
+ *               - lastname
+ *               - housenumber
+ *               - streetname
+ *               - postalcode
+ *               - country
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: jurgen@gmail.com
+ *               phone:
+ *                 type: string
+ *                 example: "0634567890"
+ *               firstname:
+ *                 type: string
+ *                 example: Jurgen
+ *               lastname:
+ *                 type: string
+ *                 example: Doe
+ *               housenumber:
+ *                 type: string
+ *                 example: 445
+ *               streetname:
+ *                 type: string
+ *                 example: Main Street
+ *               postalcode:
+ *                 type: string
+ *                 example: 12345
+ *               country:
+ *                 type: string
+ *                 example: Netherlands
+ *     responses:
+ *       201:
+ *         description: Gebruiker succesvol aangemaakt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 email:
+ *                   type: string
+ *                   example: jurgen@gmail.com
+ *                 phone:
+ *                   type: string
+ *                   example: "0634567890"
+ *                 firstname:
+ *                   type: string
+ *                   example: Jurgen
+ *                 lastname:
+ *                   type: string
+ *                   example: Doe
+ *                 housenumber:
+ *                   type: integer
+ *                   example: 5
+ *                 streetname:
+ *                   type: string
+ *                   example: Main Street
+ *                 postalcode:
+ *                   type: string
+ *                   example: 12345
+ *                 country:
+ *                   type: string
+ *                   example: Netherlands
+ *       400:
+ *         description: Ongeldig e-mailadres of gebruiker bestaat al
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Email already exists
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Server error
+ */
 
 // POST request voor het aanmaken van een nieuwe gebruiker
 router.post('/api/users', userCreationLimiter, checkSchema(createuserValidationSchema), resultValidator, async (request, response) => {
@@ -98,6 +289,79 @@ router.post('/api/users', userCreationLimiter, checkSchema(createuserValidationS
 
 
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Haal een gebruiker op aan de hand van een ID
+ *     description: |
+ *       Dit endpoint haalt een specifieke gebruiker op uit de database op basis van hun unieke ID.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: De unieke ID van de gebruiker
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Gebruiker gevonden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 UserID:
+ *                   type: integer
+ *                   example: 1
+ *                 Email:
+ *                   type: string
+ *                   example: jurgen@gmail.com
+ *                 Phone:
+ *                   type: string
+ *                   example: "0634567890"
+ *                 Firstname:
+ *                   type: string
+ *                   example: Jurgen
+ *                 Lastname:
+ *                   type: string
+ *                   example: Doe
+ *                 Housenumber:
+ *                   type: string
+ *                   example: 445
+ *                 Streetname:
+ *                   type: string
+ *                   example: Main Street
+ *                 Postalcode:
+ *                   type: string
+ *                   example: 12345
+ *                 Country:
+ *                   type: string
+ *                   example: Netherlands
+ *       404:
+ *         description: Gebruiker niet gevonden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: User not found
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Internal server error
+ */
 
 // Ophalen van users aan de hand van id
 router.get('/api/users/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
@@ -124,6 +388,96 @@ router.get('/api/users/:id', checkSchema(IDvalidatie), resultValidator, async (r
 
 
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     tags:
+ *       - Users
+ *     summary: Update een bestaande gebruiker
+ *     description: |
+ *       Dit endpoint wijzigt de gegevens van een bestaande gebruiker in de database op basis van hun unieke ID.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: De unieke ID van de gebruiker die moet worden bijgewerkt
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - phone
+ *               - firstname
+ *               - lastname
+ *               - housenumber
+ *               - streetname
+ *               - postalcode
+ *               - country
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: test@gmail.com
+ *               phone:
+ *                 type: string
+ *                 example: "0634567890"
+ *               firstname:
+ *                 type: string
+ *                 example: Jurgen
+ *               lastname:
+ *                 type: string
+ *                 example: Doe
+ *               housenumber:
+ *                 type: string
+ *                 example: 445
+ *               streetname:
+ *                 type: string
+ *                 example: Main Street
+ *               postalcode:
+ *                 type: string
+ *                 example: 12345
+ *               country:
+ *                 type: string
+ *                 example: Netherlands
+ *     responses:
+ *       200:
+ *         description: Gebruiker succesvol bijgewerkt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: User updated successfully
+ *       404:
+ *         description: Gebruiker niet gevonden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: User not found
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Internal server error
+ */
 
 // put request 
 router.put ('/api/users/:id', checkSchema(createuserValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
@@ -152,6 +506,97 @@ router.put ('/api/users/:id', checkSchema(createuserValidationSchema),  checkSch
 });
 
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   patch:
+ *     tags:
+ *       - Users
+ *     summary: Pas een bestaande gebruiker aan
+ *     description: |
+ *       Dit endpoint laat je een of meerdere gegevens van een bestaande gebruiker aanpassen op basis van hun unieke ID. Alleen de meegegeven velden worden geüpdatet.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: De unieke ID van de gebruiker die moet worden aangepast
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: jurgen@gmail.com
+ *               phone:
+ *                 type: string
+ *                 example: "0634567890"
+ *               firstname:
+ *                 type: string
+ *                 example: Jurgen
+ *               lastname:
+ *                 type: string
+ *                 example: Doe
+ *               housenumber:
+ *                 type: string
+ *                 example: 455
+ *               streetname:
+ *                 type: string
+ *                 example: Main Street
+ *               postalcode:
+ *                 type: string
+ *                 example: 12345
+ *               country:
+ *                 type: string
+ *                 example: Netherlands
+ *     responses:
+ *       200:
+ *         description: Gebruiker succesvol aangepast
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: user is updated
+ *       400:
+ *         description: Geen velden om bij te werken of e-mail bestaat al
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: there are no fields to update
+ *       404:
+ *         description: Gebruiker niet gevonden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: User not found
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Internal server error
+ */
 
 // patch request voor het aanpassen van een of meerdere gegevens in een bestand.
 router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
@@ -244,6 +689,55 @@ router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkS
 })
 
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     tags:
+ *       - Users
+ *     summary: Verwijder een bestaande gebruiker
+ *     description: |
+ *       Dit endpoint verwijdert een bestaande gebruiker uit de database op basis van hun unieke ID.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: De unieke ID van de gebruiker die moet worden verwijderd
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       204:
+ *         description: Gebruiker succesvol verwijderd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: user is verwijderd
+ *       404:
+ *         description: Gebruiker niet gevonden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: user not found
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Internal server error
+ */
 
 // delete request voor het verwijderen van een user in dit geval.
 router.delete ('/api/users/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
