@@ -529,3 +529,71 @@ export const productValidationSchema = {
         toInt: true,
     },
 };
+
+
+
+
+export const productupdateValidationSchema = {
+    CategoryID: {
+        optional: true, // Verplicht veld
+        isInt: {
+            errorMessage: "CategoryID moet een geldig nummer zijn",
+        },
+        trim: true,
+        escape: true,
+        toInt: true,
+    },
+    Name: {
+        optional: true, // Verplicht veld
+        isString: {
+            errorMessage: "Naam moet een string zijn",
+        },
+        isLength: {
+            options: { min: 1, max: 100 },
+            errorMessage: "Naam moet tussen 1 en 100 tekens lang zijn",
+        },
+        trim: true,
+        escape: true,
+    },
+    AssetsURL: {
+        optional: true, // Verplicht veld
+        isURL: {
+            errorMessage: "AssetsURL moet een geldige URL zijn",
+        },
+        isLength: {
+            options: { max: 100 },
+            errorMessage: "AssetsURL mag maximaal 100 tekens bevatten",
+        },
+        trim: true,
+    },
+    Price: {
+        optional: true, // Verplicht veld
+        isInt: {
+            options: { min: 0 },
+            errorMessage: "Prijs moet een positief geheel getal zijn",
+        },
+        trim: true,
+        toInt: true,
+    },
+    Size: {
+        optional: true, // Verplicht veld
+        isString: {
+            errorMessage: "Grootte moet een string zijn",
+        },
+        isLength: {
+            options: { max: 10 },
+            errorMessage: "Grootte mag maximaal 10 tekens bevatten",
+        },
+        trim: true,
+        escape: true,
+    },
+    AmountInStock: {
+        optional: true, // Verplicht veld
+        isInt: {
+            options: { min: 0 },
+            errorMessage: "Voorraad moet een positief geheel getal zijn",
+        },
+        trim: true,
+        toInt: true,
+    },
+};

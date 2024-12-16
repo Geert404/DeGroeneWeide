@@ -14,6 +14,131 @@ const router = Router();
 
 
 
+/**
+ * @swagger
+ * /api/bookings/:
+ *   post:
+ *     tags:
+ *       - Bookings
+ *     summary: Maak een nieuwe boeking aan
+ *     description: |
+ *       Dit endpoint maakt een nieuwe boeking aan in de database. Het controleert eerst of er een gebruiker bestaat met het opgegeven e-mailadres en of de gekozen plaats beschikbaar is binnen de opgegeven data.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - Email
+ *               - NumberOfGuests
+ *               - NumberOfKeycards
+ *               - MomentStart
+ *               - MomentEnd
+ *               - PlaceNumber
+ *               - CheckedIn
+ *             properties:
+ *               Email:
+ *                 type: string
+ *                 description: Het e-mailadres van de gebruiker die de boeking maakt.
+ *                 example: user@example.com
+ *               NumberOfGuests:
+ *                 type: integer
+ *                 description: Het aantal gasten voor de boeking.
+ *                 example: 2
+ *               NumberOfKeycards:
+ *                 type: integer
+ *                 description: Het aantal sleutelkaarten dat nodig is voor de boeking.
+ *                 example: 1
+ *               MomentStart:
+ *                 type: string
+ *                 format: date-time
+ *                 description: De startdatum en -tijd van de boeking.
+ *                 example: "2025-03-13 15:30:45"
+ *               MomentEnd:
+ *                 type: string
+ *                 format: date-time
+ *                 description: De einddatum en -tijd van de boeking.
+ *                 example: "2025-12-13 15:30:45"
+ *               PlaceNumber:
+ *                 type: string
+ *                 description: Het nummer van de plaats die geboekt wordt.
+ *                 example: "5"
+ *               CheckedIn:
+ *                 type: boolean
+ *                 description: Geeft aan of de gebruiker al is ingecheckt.
+ *                 example: false
+ *     responses:
+ *       201:
+ *         description: Boekingsinformatie succesvol aangemaakt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 BookingID:
+ *                   type: integer
+ *                   example: 1
+ *                 UserID:
+ *                   type: integer
+ *                   example: 123
+ *                 NumberOfGuests:
+ *                   type: integer
+ *                   example: 2
+ *                 NumberOfKeycards:
+ *                   type: integer
+ *                   example: 1
+ *                 MomentStart:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-03-13 15:30:45"
+ *                 MomentEnd:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-12-15 15:30:45"
+ *                 PlaceNumber:
+ *                   type: string
+ *                   example: "5"
+ *                 CheckedIn:
+ *                   type: boolean
+ *                   example: false
+ *       400:
+ *         description: Ongeldige aanvraag, bijvoorbeeld door overlapping in boekingen of ontbrekende gebruiker
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: The selected place is already booked for the chosen dates
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     example: The selected start date overlaps with an existing booking.
+ *       404:
+ *         description: Geen gebruiker gevonden met het opgegeven e-mailadres
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: No user found with given email
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Server error
+ */
+
 router.post('/api/bookings/', checkSchema(BookingValidation), resultValidator, async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
@@ -94,6 +219,81 @@ router.post('/api/bookings/', checkSchema(BookingValidation), resultValidator, a
 
 
 
+/**
+ * @swagger
+ * /api/bookings:
+ *   get:
+ *     tags:
+ *       - Bookings
+ *     summary: Haal boekingen op voor een gebruiker
+ *     description: |
+ *       Dit endpoint haalt de boekingen op voor een gebruiker aan de hand van hun e-mailadres. Het controleert of de gebruiker bestaat en retourneert alle boekingen die bij de opgegeven gebruiker horen.
+ *     parameters:
+ *       - name: Email
+ *         in: query
+ *         description: Het e-mailadres van de gebruiker waarvan de boekingen opgehaald moeten worden.
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: user@example.com
+ *     responses:
+ *       200:
+ *         description: Lijst met boekingen van de gebruiker
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   BookingID:
+ *                     type: integer
+ *                     example: 1
+ *                   UserID:
+ *                     type: integer
+ *                     example: 123
+ *                   NumberOfGuests:
+ *                     type: integer
+ *                     example: 2
+ *                   NumberOfKeycards:
+ *                     type: integer
+ *                     example: 1
+ *                   MomentStart:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-12-20T14:00:00Z"
+ *                   MomentEnd:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-12-25T10:00:00Z"
+ *                   PlaceNumber:
+ *                     type: string
+ *                     example: "5"
+ *                   CheckedIn:
+ *                     type: boolean
+ *                     example: false
+ *       404:
+ *         description: Geen gebruiker gevonden of geen boekingen voor het opgegeven e-mailadres
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: No user found with given email
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Server error
+ */
+
 router.get('/api/bookings',checkSchema(emailvalidator), resultValidator, async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request);
@@ -130,6 +330,56 @@ router.get('/api/bookings',checkSchema(emailvalidator), resultValidator, async (
 
 
 
+
+/**
+ * @swagger
+ * /api/bookings/{id}:
+ *   delete:
+ *     tags:
+ *       - Bookings
+ *     summary: Verwijder een boeking
+ *     description: |
+ *       Dit endpoint verwijdert een boeking op basis van het opgegeven BookingID. Het controleert of de boeking bestaat, en als dat het geval is, wordt deze uit de database verwijderd.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: De unieke ID van de boeking die verwijderd moet worden
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Boeking succesvol geannuleerd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Booking is cancelled
+ *       404:
+ *         description: Geen boeking gevonden met de opgegeven BookingID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: No booking found with given booking id
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Server error
+ */
 
 router.delete('/api/bookings/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen

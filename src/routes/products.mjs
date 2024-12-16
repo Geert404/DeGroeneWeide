@@ -1,7 +1,7 @@
 import { response, Router } from "express";
 import { checkSchema, matchedData, validationResult } from "express-validator";
 import pool from "../postgress/db.mjs";
-import { productValidationSchema, IDvalidatie, filterValidationSchema } from "../utils/validationschemas.mjs";
+import { productValidationSchema, IDvalidatie, filterValidationSchema, productupdateValidationSchema } from "../utils/validationschemas.mjs";
 import { resultValidator } from "../utils/middelwares.mjs";
 
 const router = Router();
@@ -486,6 +486,179 @@ router.put ('/api/products/:id', checkSchema(productValidationSchema),  checkSch
 
 });
 
+
+
+/**
+ * @swagger
+ * /api/products/{id}:
+ *   patch:
+ *     tags:
+ *       - Products
+ *     summary: Pas één of meerdere waarden van een product aan
+ *     description: |
+ *       Dit endpoint wijzigt één of meerdere waarden van een bestaand product in de database aan de hand van een opgegeven ProductID.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: De unieke ID van het product dat moet worden bijgewerkt
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               Name:
+ *                 type: string
+ *                 example: Product A
+ *               CategoryID:
+ *                 type: integer
+ *                 example: 2
+ *               AssetsURL:
+ *                 type: string
+ *                 example: "http://example.com/productA.jpg"
+ *               Price:
+ *                 type: number
+ *                 format: integer
+ *                 example: 12
+ *               Size:
+ *                 type: string
+ *                 example: "Medium"
+ *               AmountInStock:
+ *                 type: integer
+ *                 example: 100
+ *     responses:
+ *       200:
+ *         description: Product succesvol bijgewerkt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Product is updated
+ *       400:
+ *         description: Ongeldige gegevens, zoals een productnaam die al bestaat of geen velden om te updaten
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               anyOf:
+ *                 - properties:
+ *                     msg:
+ *                       type: string
+ *                       example: Product name already exists
+ *                 - properties:
+ *                     msg:
+ *                       type: string
+ *                       example: No fields to update
+ *       404:
+ *         description: Product niet gevonden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Product not found
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: Internal server error
+ */
+
+// patch request voor het aanpassen van een of meerdere gegevens in een bestand.
+router.patch ('/api/products/:id', checkSchema(productupdateValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+    // gevalideerde data wordt opgeslagen in data variabelen
+    const data = matchedData(request); 
+    const ProductID = request.params.id;
+
+    try {
+        const [existingProduct] = await pool.query('SELECT * FROM products WHERE ProductID = ?', [ProductID]);
+
+        if (existingProduct.length === 0) {
+            return response.status(404).send({msg: "Product not found"}); 
+        }
+
+        // toevoegen van dynamische velden.
+        const teUpdatenVelden =[];
+        const teUpdatenWaarden = [];
+
+        // controleren van alle velden en waarden.
+        if(data.CategoryID){
+            teUpdatenVelden.push(`CategoryID = ?`);
+            teUpdatenWaarden.push(data.CategoryID);
+        }
+        if(data.AssetsURL){
+            teUpdatenVelden.push(`AssetsURL = ?`);
+            teUpdatenWaarden.push(data.AssetsURL);
+        }
+        if(data.Price){
+            teUpdatenVelden.push(`Price = ?`);
+            teUpdatenWaarden.push(data.Price);
+        }
+        if(data.Size){
+            teUpdatenVelden.push(`Size = ?`);
+            teUpdatenWaarden.push(data.Size);
+        }
+        if(data.AmountInStock){
+            teUpdatenVelden.push(`AmountInStock = ?`);
+            teUpdatenWaarden.push(data.AmountInStock);
+        }
+        if(data.Name){
+            teUpdatenVelden.push(`Name = ?`);
+            teUpdatenWaarden.push(data.Name);
+        }
+
+
+        //ProductID toevoegen aan de lijst
+        teUpdatenWaarden.push(ProductID);
+
+        if (teUpdatenVelden === 0){
+            return response.status(400).send({msg: "there are no fields to update"});
+        } 
+
+        // Stap 1: Controleer of de naam van het product al bestaat in de database
+        const [existingName] = await pool.query(`SELECT * FROM products WHERE Name = ?`, [data.Name]); 
+
+        // Als de e-mail al bestaat, stuur dan een foutmelding terug
+        if (existingName.length > 0) {
+            return response.status(400).send({ msg: "Product name already exists" });
+        }
+
+        //opstellen van de query
+        const sqlQuery = `
+            UPDATE products
+            SET ${teUpdatenVelden.join(', ')} WHERE ProductID = ?
+        `;
+
+        //uitvoeren van de query
+        const [updatedProduct] = await pool.query(sqlQuery, teUpdatenWaarden);
+
+        if (updatedProduct.affectedRows === 0 ){
+            return response.status(400).send({msg: "no given values to update"})
+        }
+
+        return response.status(200).send({msg: "product is updated"})
+
+    } catch (error) {
+         // Foutafhandeling: Log de fout en stuur een interne serverfout terug
+        console.error('Database error:', error);
+        return response.status(500).send({ msg: 'Internal server error' });
+    }
+});
 
 
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { checkSchema, matchedData, validationResult } from "express-validator";
 import pool from "../postgress/db.mjs";
-import { categoryValidationSchema, productValidationSchema, IDvalidatie } from "../utils/validationschemas.mjs";
+import { categoryValidationSchema, IDvalidatie } from "../utils/validationschemas.mjs";
 import { resultValidator } from "../utils/middelwares.mjs";
 
 const router = Router();
