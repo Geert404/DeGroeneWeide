@@ -159,26 +159,89 @@ router.get('/api/categories', async (request, response) => {
  * /api/categories/{id}:
  *   get:
  *     tags:
- *       - categories
- *     description: Ophalen van alle producten aan de hand van category ID.
+ *       - Categories
+ *     summary: Ophalen van producten op basis van categorie ID
+ *     description: |
+ *       Dit endpoint haalt een lijst op van alle producten die zijn gekoppeld aan het opgegeven categorie ID.
+ *       Als er geen producten worden gevonden voor de opgegeven categorie ID, wordt een 404 foutmelding geretourneerd.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: Het categorie ID
+ *         description: Het unieke ID van de categorie waarvan de producten moeten worden opgehaald
  *         schema:
  *           type: integer
  *           example: 1
  *     responses:
  *       200:
- *         description: A list of products in the category
+ *         description: Een lijst van producten in de opgegeven categorie
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   ProductID:
+ *                     type: integer
+ *                     description: De unieke ID van het product
+ *                     example: 101
+ *                   CategoryID:
+ *                     type: integer
+ *                     description: De unieke ID van het product
+ *                     example: 1
+ *                   AssetsURL:
+ *                     type: string
+ *                     format: uri
+ *                     example: 'https://example.com/images/product-a.jpg'
+ *                   Name:
+ *                     type: string
+ *                     description: De naam van het product
+ *                     example: 'Product A'
+ *                   Price:
+ *                     type: integer
+ *                     description: De prijs van het product in centen (bijv. 1000 = €10,00)
+ *                     example: 1299
+ *                   Size:
+ *                     type: string
+ *                     description: De grootte of afmetingen van het product
+ *                     example: 'M'
+ *                   AmountInStock:
+ *                     type: integer
+ *                     description: Het aantal producten op voorraad
+ *                     example: 50
  *       404:
- *         description: No products found for the given category ID
+ *         description: Geen producten gevonden voor de opgegeven categorie ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'No products found for given category ID'
  *       400:
- *         description: Invalid category ID
+ *         description: Ongeldig categorie ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Invalid category ID'
  *       500:
- *         description: Server error
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Internal server error'
  */
+
 router.get('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     const data = matchedData(request); 
     const categoryID = data.id;
@@ -189,7 +252,7 @@ router.get('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, asy
         if (existingCategory.length > 0) {
             return response.status(200).json(existingCategory);
         } else {
-            return response.status(404).send({ msg: 'No products found for given categoryID' });
+            return response.status(404).send({ msg: 'No products found for given category ID' });
         }
     } catch (error) {
         console.error('Database error:', error);
@@ -202,24 +265,62 @@ router.get('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, asy
  * /api/categories/{id}:
  *   delete:
  *     tags:
- *       - categories
- *     description: verwijderen van categorie aan de hand van ID.
+ *       - Categories
+ *     summary: Verwijderen van een categorie op basis van ID
+ *     description: |
+ *       Dit endpoint verwijdert een categorie uit de database aan de hand van het opgegeven categorie ID. 
+ *       Als de categorie niet wordt gevonden, wordt een 404 foutmelding geretourneerd.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: Het categorie ID om te verwijderen
+ *         description: Het unieke ID van de categorie
  *         schema:
  *           type: integer
  *           example: 1
  *     responses:
  *       200:
- *         description: Category successfully deleted
+ *         description: Categorie succesvol verwijderd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Category successfully deleted'
  *       404:
- *         description: Category not found
+ *         description: geen categorie gevonden voor opgegeven ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'No category found with given ID'
+ *       400:
+ *         description: Ongeldig categorie ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Invalid category ID'
  *       500:
- *         description: Server error
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Server error'
  */
+
 router.delete('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     const data = matchedData(request);
     const categoryID = data.id;
