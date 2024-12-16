@@ -1,16 +1,46 @@
+<!DOCTYPE html>
 <html>
-	<body>
-		<h1>Hallo van de Ubuntu server!</h1>
-		<h2>Hier werken de Brabbelaars</h2>
-		<h3>De github-code wordt automatisch op de server gezet!</h3>
-		<h4>Huidige datum en tijd:<p id="date-time"></p></h4>
-		<script>
-			function displayDateTime() {
-                const now = new Date();
-                const dateTime = now.toLocaleString();
-                document.getElementById("date-time").textContent = dateTime;
-			}
-			displayDateTime();
-		</script>
-	</body>
+  <head>
+    <link rel="stylesheet" href="index.css"/>
+    <script src="index.js"></script> 
+  </head>
+  <body>
+    <template id="ingredient-kaart">
+      <link rel="stylesheet" href="index.css"/>
+      <!-- Hoofd container van de ingredienten kaart -->
+      
+      <div class= "ingredient-container">
+        <div class="ingredient-foto">
+          <img src="images/Placeholder.jpg">
+          <!--Prijs en aantal-->
+          <div class="prijs-en-aantal">
+            <p class="prijs">4.<span class="prijs-cent">99</span></p>
+            <p class="hoeveelheid">100g</p>
+          </div>
+          
+        </div >
+        <!--Bestelknop met titel-->
+        <div class="bestel-knop-en-titel">
+          <p>Wagyu</p>
+          <!-- Bestel knop-->
+          <div class="bestel-knop-container-small">
+            <img src="Icons/Plus-icon.svg">
+          </div>
+        </div>
+        <div class="uitklap-en-voorraad">
+          <div>
+            <img class="uitklap-icon" src="Icons/Expand-icon.svg">
+          </div>
+          <p class="voorraad">voorraad: <span>15</span></p>
+        </div>
+
+      </div>
+    </template>
+    <ingredient-kaart></ingredient-kaart>
+    <ingredient-kaart></ingredient-kaart>
+    <div id="parent">
+
+    </div>
+      
+  </body>
 </html>
