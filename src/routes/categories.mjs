@@ -2,6 +2,7 @@ import { Router } from "express";
 import { checkSchema, matchedData, validationResult } from "express-validator";
 import pool from "../postgress/db.mjs";
 import { categoryValidationSchema, productValidationSchema, IDvalidatie } from "../utils/validationschemas.mjs";
+import { resultValidator } from "../utils/middelwares.mjs";
 
 const router = Router();
 
@@ -9,6 +10,8 @@ const router = Router();
  * @swagger
  * /api/categories:
  *   post:
+ *     tags:
+ *       - categories
  *     description: maakt een nieuwe categorie aan.
  *     requestBody:
  *       required: true
@@ -30,16 +33,7 @@ const router = Router();
  *       500:
  *         description: Server error
  */
-router.post('/api/categories', checkSchema(categoryValidationSchema), async (request, response) => {
-    const result = validationResult(request);
-    if (!result.isEmpty()) {
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors });
-    }
-
+router.post('/api/categories', checkSchema(categoryValidationSchema), resultValidator, async (request, response) => {
     const data = matchedData(request); 
 
     try {
@@ -68,6 +62,8 @@ router.post('/api/categories', checkSchema(categoryValidationSchema), async (req
  * @swagger
  * /api/categories:
  *   get:
+ *     tags:
+ *       - categories
  *     description: Ophalen van alle categorieen.
  *     responses:
  *       200:
@@ -94,6 +90,8 @@ router.get('/api/categories', async (request, response) => {
  * @swagger
  * /api/categories/{id}:
  *   get:
+ *     tags:
+ *       - categories
  *     description: Ophalen van alle producten aan de hand van category ID.
  *     parameters:
  *       - in: path
@@ -113,16 +111,7 @@ router.get('/api/categories', async (request, response) => {
  *       500:
  *         description: Server error
  */
-router.get('/api/categories/:id', checkSchema(IDvalidatie), async (request, response) => {
-    const result = validationResult(request);
-    if (!result.isEmpty()) {
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).json({ errors: formattedErrors });
-    }
-    
+router.get('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     const data = matchedData(request); 
     const categoryID = data.id;
     
@@ -144,6 +133,8 @@ router.get('/api/categories/:id', checkSchema(IDvalidatie), async (request, resp
  * @swagger
  * /api/categories/{id}:
  *   delete:
+ *     tags:
+ *       - categories
  *     description: verwijderen van categorie aan de hand van ID.
  *     parameters:
  *       - in: path
@@ -161,16 +152,7 @@ router.get('/api/categories/:id', checkSchema(IDvalidatie), async (request, resp
  *       500:
  *         description: Server error
  */
-router.delete('/api/categories/:id', checkSchema(IDvalidatie), async (request, response) => {
-    const result = validationResult(request);
-    if (!result.isEmpty()) {
-        const formattedErrors = result.array().map((error) => ({
-            field: error.path,
-            message: error.msg,
-        }));
-        return response.status(400).send({ errors: formattedErrors });
-    }
-
+router.delete('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     const data = matchedData(request);
     const categoryID = data.id;
 

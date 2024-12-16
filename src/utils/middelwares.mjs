@@ -1,6 +1,8 @@
 import { request, response } from "express";
 import { MockUsers } from "./constants.mjs";
 import rateLimit from 'express-rate-limit'; // Importeren van express-rate-limit
+import {validationResult,} from "express-validator"
+
 
 //midelware code functie voor het opzoeken van een id
 export const resolveIndexByUserId = (request, response, next) => {
@@ -25,6 +27,22 @@ export const userCreationLimiter = rateLimit({
     max: 100, // Maximaal 100 verzoeken per IP
     message: 'Too many accounts created from this IP, please try again later',
 });
+
+
+
+
+export const resultValidator = (request, response, next) => {
+    const result = validationResult(request);
+    if (!result.isEmpty()) {
+    const formattedErrors = result.array().map((error) => ({
+            field: error.path,
+            message: error.msg,
+    }));
+        return response.status(400).send({ errors: formattedErrors });
+    };
+    next();
+};
+
 
 
 
