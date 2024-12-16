@@ -11,8 +11,10 @@ const router = Router();
  * /api/categories:
  *   post:
  *     tags:
- *       - categories
- *     description: maakt een nieuwe categorie aan.
+ *       - Categories
+ *     summary: Maak een nieuwe categorie aan
+ *     description: |
+ *       Dit endpoint maakt een nieuwe categorie aan in de database. Het valideert de ingevoerde gegevens, zoals de naam van de categorie, en controleert of de categorie nog niet bestaat.
  *     requestBody:
  *       required: true
  *       content:
@@ -24,15 +26,46 @@ const router = Router();
  *             properties:
  *               Name:
  *                 type: string
- *                 example: 'Fruits'
+ *                 description: De naam van de categorie (max. 100 tekens)
+ *                 example: 'Zuivel'
  *     responses:
  *       201:
- *         description: Category created successfully
+ *         description: Categorie succesvol aangemaakt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 CategoryID:
+ *                   type: integer
+ *                   description: De unieke ID van de aangemaakte categorie
+ *                   example: 20
+ *                 Name:
+ *                   type: string
+ *                   description: De naam van de categorie
+ *                   example: 'Zuivel'
  *       400:
- *         description: Category already exists or validation errors
+ *         description: Fout in de validatie of categorie bestaat al
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'category already exsists'
  *       500:
- *         description: Server error
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Internal server error'
  */
+
 router.post('/api/categories', checkSchema(categoryValidationSchema), resultValidator, async (request, response) => {
     const data = matchedData(request); 
 
@@ -63,16 +96,51 @@ router.post('/api/categories', checkSchema(categoryValidationSchema), resultVali
  * /api/categories:
  *   get:
  *     tags:
- *       - categories
- *     description: Ophalen van alle categorieen.
+ *       - Categories
+ *     summary: Ophalen van alle categorieën
+ *     description: |
+ *       Dit endpoint haalt een lijst op van alle bestaande productcategorieën uit de database.
+ *       Als er geen categorieën worden gevonden, wordt een 404 foutmelding geretourneerd.
  *     responses:
  *       200:
- *         description: Een lijst van alle product categorieen.
+ *         description: Een lijst van alle productcategorieën
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   CategoryID:
+ *                     type: integer
+ *                     description: De unieke ID van de categorie
+ *                     example: 1
+ *                   Name:
+ *                     type: string
+ *                     description: De naam van de categorie
+ *                     example: 'Fruits'
  *       404:
- *         description: No categories found
+ *         description: Geen categorieën gevonden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'No categories found'
  *       500:
- *         description: Server error
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Internal server error'
  */
+
 router.get('/api/categories', async (request, response) => {
     try {
         const [ophalencategoryProducten] = await pool.query(`SELECT * FROM product_categories`);

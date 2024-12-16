@@ -11,8 +11,10 @@ const router = Router();
  * /api/products:
  *   post:
  *     tags:
- *       - products
- *     description: Voeg een nieuw product toe.
+ *       - Products
+ *     summary: Voeg een nieuw product toe
+ *     description: |
+ *       Dit endpoint voegt een nieuw product toe aan de database. Controleert of alle vereiste velden correct zijn ingevuld en of het product nog niet bestaat.
  *     requestBody:
  *       required: true
  *       content:
@@ -29,28 +31,92 @@ const router = Router();
  *             properties:
  *               Name:
  *                 type: string
+ *                 description: De naam van het product
  *                 example: 'Product A'
  *               CategoryID:
  *                 type: integer
+ *                 description: De ID van de categorie waartoe het product behoort
+ *                 example: 3
  *               AssetsURL:
  *                 type: string
  *                 format: uri
+ *                 description: URL naar de productafbeeldingen of andere assets
+ *                 example: 'https://example.com/images/product-a.jpg'
  *               Price:
  *                 type: integer
+ *                 description: De prijs van het product in centen (bijv. 1000 = €10,00)
+ *                 example: 1299
  *               Size:
  *                 type: string
+ *                 description: De grootte of afmetingen van het product
+ *                 example: 'M'
  *               AmountInStock:
  *                 type: integer
+ *                 description: Het aantal producten op voorraad
+ *                 example: 50
  *     responses:
  *       201:
  *         description: Product succesvol toegevoegd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ProductID:
+ *                   type: integer
+ *                   description: De unieke ID van het toegevoegde product
+ *                   example: 101
+ *                 Name:
+ *                   type: string
+ *                   example: 'Product A'
+ *                 CategoryID:
+ *                   type: integer
+ *                   example: 3
+ *                 AssetsURL:
+ *                   type: string
+ *                   format: uri
+ *                   example: 'https://example.com/images/product-a.jpg'
+ *                 Price:
+ *                   type: integer
+ *                   example: 1299
+ *                 Size:
+ *                   type: string
+ *                   example: 'M'
+ *                 AmountInStock:
+ *                   type: integer
+ *                   example: 50
  *       400:
  *         description: Fout in de validatie of product bestaat al
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Validation error: Name is required'
  *       404:
  *         description: Ongeldige CategoryID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Invalid category ID'
  *       500:
  *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Internal server error'
  */
+
 
 router.post('/api/products', checkSchema(productValidationSchema), resultValidator, async (request, response) => {
     const data = matchedData(request); 
@@ -96,8 +162,10 @@ router.post('/api/products', checkSchema(productValidationSchema), resultValidat
  * /api/products:
  *   get:
  *     tags:
- *       - products
- *     description: Haal alle producten op.
+ *       - Products
+ *     summary: Haal alle producten op
+ *     description: |
+ *       Dit endpoint haalt een lijst op van alle producten in de database.
  *     responses:
  *       200:
  *         description: Een lijst van alle producten.
@@ -122,7 +190,7 @@ router.post('/api/products', checkSchema(productValidationSchema), resultValidat
  *                     example: 'http://example.com/product.jpg'
  *                   Price:
  *                     type: integer
- *                     description: Prijs van het product in de lokale valuta
+ *                     description: Prijs van het product in centen (bijv. 1000 = €10,00)
  *                     example: 1999
  *                   Size:
  *                     type: string
@@ -133,10 +201,27 @@ router.post('/api/products', checkSchema(productValidationSchema), resultValidat
  *                     description: Aantal beschikbare producten op voorraad
  *                     example: 100
  *       404:
- *         description: Geen producten gevonden.
+ *         description: Geen producten gevonden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'No products found'
  *       500:
  *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Internal server error'
  */
+
 
 router.get('/api/products', async (request, response) => {
     try {
@@ -156,7 +241,8 @@ router.get('/api/products', async (request, response) => {
  * /api/products/{id}:
  *   get:
  *     tags:
- *       - products
+ *       - Products
+ *     summary: Haalt product op aan de hand van productID
  *     description: Haal een product op op basis van ID.
  *     parameters:
  *       - in: path
@@ -174,6 +260,10 @@ router.get('/api/products', async (request, response) => {
  *             schema:
  *               type: object
  *               properties:
+ *                 ProductID:
+ *                   type: integer
+ *                   description: ID van het product
+ *                   example: 5
  *                 Name:
  *                   type: string
  *                   description: Naam van het product
@@ -199,12 +289,37 @@ router.get('/api/products', async (request, response) => {
  *                   type: integer
  *                   description: Aantal beschikbare producten op voorraad
  *                   example: 100
- *       404:
- *         description: Product niet gevonden.
+ *
  *       400:
- *         description: Ongeldige ID.
+ *         description: niet geldig ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Product ID must be an integer'
+ *       404:
+ *         description: Geen producten gevonden bij opgegeven ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'product not found'
  *       500:
  *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Internal server error'
  */
 
 router.get('/api/products/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
@@ -230,8 +345,9 @@ router.get('/api/products/:id', checkSchema(IDvalidatie), resultValidator, async
  * /api/products/{id}:
  *   delete:
  *     tags:
- *       - products
- *     description: Verwijder een product op basis van ID.
+ *       - Products
+ *     summary: verwijderen van een product op basis van product ID
+ *     description: Verwijder een product op basis van product ID.
  *     parameters:
  *       - in: path
  *         name: id
@@ -242,11 +358,35 @@ router.get('/api/products/:id', checkSchema(IDvalidatie), resultValidator, async
  *           example: 1
  *     responses:
  *       200:
- *         description: Product succesvol verwijderd.
+ *         description: Product succesvol verwijderd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Product is deleted'
  *       404:
- *         description: Product niet gevonden.
+ *         description: Geen producten gevonden bij opgegeven ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'No product found with given product ID'
  *       500:
- *         description: Serverfout.
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Internal server error'
  */
 
 router.delete('/api/products/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
