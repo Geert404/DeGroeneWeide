@@ -686,7 +686,7 @@ router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkS
         console.error('Database error:', error);
         return response.status(500).send({ msg: 'Internal server error' });
     }
-})
+});
 
 
 /**

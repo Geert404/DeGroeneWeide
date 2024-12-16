@@ -338,4 +338,118 @@ router.delete('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, 
     }
 });
 
+
+
+
+/**
+ * @swagger
+ * /api/categories/{id}:
+ *   put:
+ *     tags:
+ *       - Categories
+ *     summary: Update een bestaande categorie
+ *     description: |
+ *       Dit endpoint wijzigt de gegevens van een bestaande categorie aan de hand van het opgegeven Cateegory ID.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: De unieke ID van de categorie die moet worden bijgewerkt
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - Name
+ *             properties:
+ *               Name:
+ *                 type: string
+ *                 example: 'Fruits'
+ *     responses:
+ *       200:
+ *         description: Categorie succesvol bijgewerkt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Category updated successfully'
+ *       400:
+ *         description: Categorie naam bestaat al
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Category name already exists'
+ *       404:
+ *         description: Categorie niet gevonden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Category not found'
+ *       500:
+ *         description: Serverfout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: 'Internal server error'
+ */
+
+// put request 
+router.put ('/api/categories/:id', checkSchema(categoryValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+    // gevalideerde data wordt opgeslagen in data variabelen
+    const data = matchedData(request); 
+    const CategoryID = request.params.id;
+
+    try {
+        
+        const [exsisting_category] = await pool.query(
+            `SELECT * from product_categories WHERE Name = ?`,
+            [data.Name]
+        );
+        
+        if(exsisting_category.length !== 0){
+            return response.status(400).send({msg: 'category name already exsists'})
+        }
+
+        const [updatedCategory] = await pool.query(
+            `UPDATE product_categories
+             SET Name = ? WHERE CategoryID = ?`, // SQL query om een gebruiker toe te voegen
+            [data.Name, CategoryID] // De waarden die in de query moeten worden ingevuld
+        );
+        
+        if (updatedCategory.affectedRows === 0) {
+            return response.status(404).send({ msg: 'Category not found' });  // Als er geen rijen zijn bijgewerkt stuur 404 status
+        }
+        return response.status(200).send({ msg: 'Category updated successfully' }); //false run 200 status
+
+    } catch (error) {
+        // Verbeterde foutafhandeling: Log de fout en geef een interne serverfout terug
+        console.error('Database error:', error);
+        return response.status(500).send({ msg: 'Internal server error' });
+    }
+
+});
+
+
+
+
 export default router;
