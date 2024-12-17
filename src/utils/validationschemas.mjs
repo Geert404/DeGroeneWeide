@@ -19,13 +19,13 @@ export const createuserValidationSchema = {
         ...notEmptyValidation('Housenumber'),
     },
     Streetname: {
-        ...baseStringValidation('streetname', 3, 10, /^[A-Za-z0-9 .'-]+$/, 'Streetname contains invalid characters'),
+        ...baseStringValidation('streetname', 3, 30, /^[A-Za-z0-9 .'-]+$/, 'Streetname contains invalid characters'),
     },
     Postalcode: {
-        ...baseStringValidation('streetname', 4, 10, /^[A-Za-z0-9 -]+$/, 'Postalcode contains invalid characters'),
+        ...baseStringValidation('Postalcode', 4, 10, /^[A-Za-z0-9 -]+$/, 'Postalcode contains invalid characters'),
     },
     Country: {
-        ...baseStringValidation('streetname', 4, 30, /^[A-Za-z .'-]+$/, 'Country contains invalid characters'),
+        ...baseStringValidation('Country', 4, 30, /^[A-Za-z .'-]+$/, 'Country contains invalid characters'),
     },
     Email: {
         ...notEmptyValidation('Email'),
@@ -87,7 +87,7 @@ export const updateUserValidationSchema = {
     Streetname: {
         optional: true,
         ...isStringValidation('Streetname'),
-        ...isLengthValidation(3, 100, 'Streetname'),
+        ...isLengthValidation(3, 30, 'Streetname'),
         ...matchesValidation(/^[A-Za-z0-9 .'-]+$/, 'Streetname contains invalid characters'),
         trim: true, // Verwijder voor- en achterwaartse spaties
         escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen

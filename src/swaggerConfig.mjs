@@ -13,7 +13,7 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: 'http://localhost:3000', // Pas dit aan naar je serveradres
+                url: 'http://localhost:8080', // Pas dit aan naar je serveradres
                 description: 'Development server',
             },
         ],

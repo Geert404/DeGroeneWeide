@@ -492,6 +492,19 @@ router.put ('/api/users/:id', checkSchema(createuserValidationSchema),  checkSch
     const data = matchedData(request); 
     const UserID = request.params.id;
 
+    const [existingEmail] = await pool.query(`SELECT * FROM users WHERE Email = ?`, [data.Email]); 
+    // Als de e-mail al bestaat, stuur dan een foutmelding terug
+    if (existingEmail.length > 0) {
+        return response.status(400).send({ msg: "Email already exists" });
+    }
+
+    const [existingPhone] = await pool.query(`SELECT * FROM users WHERE Phone = ?`, [data.Phone]); 
+
+    // Als de e-mail al bestaat, stuur dan een foutmelding terug
+    if (existingPhone.length > 0) {
+        return response.status(400).send({ msg: "Phone number already exists" });
+    }
+
     try {
         const [updatedUser] = await pool.query(
             `UPDATE users
@@ -672,7 +685,14 @@ router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkS
         if (existingEmail.length > 0) {
             return response.status(400).send({ msg: "Email already exists" });
         }
-
+    
+        const [existingPhone] = await pool.query(`SELECT * FROM users WHERE Phone = ?`, [data.Phone]); 
+    
+        // Als de e-mail al bestaat, stuur dan een foutmelding terug
+        if (existingPhone.length > 0) {
+            return response.status(400).send({ msg: "Phone number already exists" });
+        }
+        
         //opstellen van de query
         const sqlQuery = `
             UPDATE users
