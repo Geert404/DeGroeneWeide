@@ -9,15 +9,15 @@ import './strategies/local-strategies.mjs';
 import { swaggerDocs } from './swaggerConfig.mjs'; // Zorg ervoor dat het pad klopt
 import cors from 'cors'; // Vergeet niet om cors te importeren
 
-// Maak een nieuwe Express-applicatie genaamd app
-const app = express();
-
-const corsOptions = {
-    origin: 'http://frontend.com', // Specifieke frontend-domain
+export const corsOptions = {
+    origin: 'http://127.0.0.1:3198', // Specifieke frontend-domain
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Alleen GET en POST-methodes toestaan
     allowedHeaders: ['Content-Type', 'Authorization'], // Toegestane headers
     credentials: true, // Cookies toestaan
 };
+// Maak een nieuwe Express-applicatie genaamd app
+const app = express();
+
 
 // Gebruik express.json voor body parsing
 app.use(cors(corsOptions)); // Pas CORS toe met de opties
@@ -113,7 +113,7 @@ app.use(session({
     });
 
 // Stel de poort in waarop de server draait
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

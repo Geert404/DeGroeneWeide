@@ -3,8 +3,11 @@ import { checkSchema, matchedData, validationResult } from "express-validator";
 import pool from "../postgress/db.mjs";
 import { categoryValidationSchema, IDvalidatie } from "../utils/validationschemas.mjs";
 import { resultValidator } from "../utils/middelwares.mjs";
+import cors from 'cors';
+import { corsOptions } from "../index.mjs";
 
 const router = Router();
+router.use(cors(corsOptions));
 
 /**
  * @swagger
@@ -141,7 +144,8 @@ router.post('/api/categories', checkSchema(categoryValidationSchema), resultVali
  *                   example: 'Internal server error'
  */
 
-router.get('/api/categories', async (request, response) => {
+
+router.get('/api/categories', cors(corsOptions), async (request, response) => {
     try {
         const [ophalencategoryProducten] = await pool.query(`SELECT * FROM product_categories`);
         if (ophalencategoryProducten.length === 0) {
