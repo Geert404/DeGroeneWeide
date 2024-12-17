@@ -1,109 +1,41 @@
-import { escape } from "mysql2";
+
+
+import { isStringValidation, isLengthValidation, notEmptyValidation, matchesValidation, baseStringValidation } from "./validatie_helpers.mjs"
 
 export const createuserValidationSchema = {
-    firstname: {
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "Firstname must be a string",
-        },
-        isLength: {
-            options: { min: 3, max: 32 },
-            errorMessage: "firstname must be between 3 and 32 characters",
-        },
-        notEmpty: {
-            errorMessage: "Firstname cannot be empty",
-        },
-        trim: true, // Verwijder voor- en achterwaartse spaties
-        escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
+    Firstname: {
+        ...isStringValidation('Firstname'),
+        ...isLengthValidation(3, 32, 'Firstname'),
+        ...notEmptyValidation('Firstname'),
     },
-    lastname: {
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "Lastname must be a string",
-        },
-        isLength: {
-            options: { min: 3, max: 32 },
-            errorMessage: "Lastname must be between 3 and 32 characters",
-        },
-        notEmpty: {
-            errorMessage: "Lastname cannot be empty",
-        },
-        trim: true, // Verwijder voor- en achterwaartse spaties
-        escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
+    Lastname: {
+        ...isStringValidation('Lastname'),
+        ...isLengthValidation(3, 32, 'Lastname'),
+        ...notEmptyValidation('Lastname'),
     },
-    housenumber: {
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "House number must be a string",
-        },
-        isLength: {
-            options: { min: 3, max: 10 },
-            errorMessage: "House number must be between 3 and 10 characters",
-        },
-        notEmpty: {
-            errorMessage: "House number cannot be empty",
-        },
-        trim: true, // Verwijder voor- en achterwaartse spaties
-        escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
+    Housenumber: {
+        ...isStringValidation('Housenumber'),
+        ...isLengthValidation(1, 6, 'Housenumber'),
+        ...notEmptyValidation('Housenumber'),
     },
-    streetname: {
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "Street number must be a string",
-        },
-        isLength: {
-            options: { min: 3, max: 100 },
-            errorMessage: "Street number must be between 3 and 10 characters",
-        },
-        notEmpty: {
-            errorMessage: "Street number cannot be empty",
-        },
-        matches: {
-            options: /^[A-Za-z0-9 .'-]+$/,
-            errorMessage: "Street name contains invalid charachters"
-        },
-        trim: true, // Verwijder voor- en achterwaartse spaties
-        escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
+    Streetname: {
+        ...baseStringValidation('streetname', 3, 10, /^[A-Za-z0-9 .'-]+$/, 'Streetname contains invalid characters'),
     },
-    postalcode: {
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "Postal code must be a string",
-        },
-        isLength: {
-            options: { min: 4, max: 10 },
-            errorMessage: "Postal code must be between 4 and 10 characters",
-        },
-        notEmpty: {
-            errorMessage: "Postal code cannot be empty",
-        },
-        matches: {
-            options: /^[A-Za-z0-9 -]+$/,
-            errorMessage: "Postal code contains invalid characters"
-        },
-        trim: true, // Verwijder voor- en achterwaartse spaties
-        escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
+    Postalcode: {
+        ...baseStringValidation('streetname', 4, 10, /^[A-Za-z0-9 -]+$/, 'Postalcode contains invalid characters'),
     },
-    country: {
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "Country must be a string",
-        },
-        isLength: {
-            options: { min: 4, max: 30 },
-            errorMessage: "Country must be between 4 and 30 characters",
-        },
-        notEmpty: {
-            errorMessage: "country cannot be empty",
-        },
-        matches: {
-            options: /^[A-Za-z .'-]+$/,
-            errorMessage: "Country contains invalid characters",
-        },
-        trim: true, // Verwijder voor- en achterwaartse spaties
-        escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
+    Country: {
+        ...baseStringValidation('streetname', 4, 30, /^[A-Za-z .'-]+$/, 'Country contains invalid characters'),
     },
-    phone: {
+    Email: {
+        ...notEmptyValidation('Email'),
+        isEmail: { errorMessage: "Invalid email format" },
+        normalizeEmail: true,
+        trim: true,
+        escape: true,
+    },
+    Phone: {
+        ...isLengthValidation(10, 15, 'Phone number'),
         optional: true,
         customSanitizer: {
             options: (value) => {
@@ -115,19 +47,14 @@ export const createuserValidationSchema = {
             options: ['nl-NL', 'de-DE'], // controleerd of telefoon nummer voldoet aan nl of de format
             errorMessage: "Invalid phone number format. Please enter a valid Dutch or German phone number.",
         },
-        isLength: {
-            options: { min: 10, max: 15 },
-            errorMessage: "Phone number should be between 10 and 15 digits",
-        },
     },
-    email: {
+};
+
+export const emailvalidator = {
+    Email: {
+        ...notEmptyValidation('Email'),
         // Controleer of het e-mailadres een geldig formaat heeft
-        isEmail: {
-            errorMessage: "Invalid email format",
-        },
-        notEmpty: {
-            errorMessage: "Email cannot be empty",
-        },
+        isEmail: { errorMessage: "Invalid email format" },
         normalizeEmail: true, // Normaliseer het e-mailadres (bijv. zet alles om naar kleine letters)
         trim: true, // Verwijder voor- en achterwaartse spaties
         escape: true, // Escape gevaarlijke tekens
@@ -135,101 +62,54 @@ export const createuserValidationSchema = {
 };
 
 
-
-
 export const updateUserValidationSchema = {
-    firstname: {
+    Firstname: {
         optional: true,
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "Firstname must be a string",
-        },
-        isLength: {
-            options: { min: 3, max: 32 },
-            errorMessage: "firstname must be between 3 and 32 characters",
-        },
+        ...isStringValidation('Firstname'),
+        ...isLengthValidation(3, 32, 'Firstname'),
         trim: true, // Verwijder voor- en achterwaartse spaties
         escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
-
-    },
-    lastname: {
+},
+    Lastname: {
         optional: true,
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "Lastname must be a string",
-        },
-        isLength: {
-            options: { min: 3, max: 32 },
-            errorMessage: "Lastname must be between 3 and 32 characters",
-        },
+        ...isStringValidation('Lastname'),
+        ...isLengthValidation(3, 32, 'Lastname'),
         trim: true, // Verwijder voor- en achterwaartse spaties
         escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
     },
-    housenumber: {
+    Housenumber: {
         optional: true,
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "House number must be a string",
-        },
-        isLength: {
-            options: { min: 3, max: 10 },
-            errorMessage: "House number must be between 3 and 10 characters",
-        },
+        ...isStringValidation('Housenumber'),
+        ...isLengthValidation(1, 5, 'Housenumber'),
         trim: true, // Verwijder voor- en achterwaartse spaties
         escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
     },
-    streetname: {
+    Streetname: {
         optional: true,
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "Street number must be a string",
-        },
-        isLength: {
-            options: { min: 3, max: 100 },
-            errorMessage: "Street number must be between 3 and 10 characters",
-        },
-        matches: {
-            options: /^[A-Za-z0-9 .'-]+$/,
-            errorMessage: "Street name contains invalid charachters"
-        },
+        ...isStringValidation('Streetname'),
+        ...isLengthValidation(3, 100, 'Streetname'),
+        ...matchesValidation(/^[A-Za-z0-9 .'-]+$/, 'Streetname contains invalid characters'),
         trim: true, // Verwijder voor- en achterwaartse spaties
         escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
     },
-    postalcode: {
+    Postalcode: {
         optional: true,
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "Postal code must be a string",
-        },
-        isLength: {
-            options: { min: 4, max: 10 },
-            errorMessage: "Postal code must be between 4 and 10 characters",
-        },
-        matches: {
-            options: /^[A-Za-z0-9 -]+$/,
-            errorMessage: "Postal code contains invalid characters"
-        },
+        ...isStringValidation('Postalcode'),
+        ...isLengthValidation(4, 10, 'Postalcode'),
+        ...matchesValidation(/^[A-Za-z0-9 -]+$/, "Postal code contains invalid characters"),
         trim: true, // Verwijder voor- en achterwaartse spaties
         escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
     },
-    country: {
+    Country: {
         optional: true,
-        // Controleer of de naam een string is en de lengte binnen het bereik ligt
-        isString: {
-            errorMessage: "Country must be a string",
-        },
-        isLength: {
-            options: { min: 3, max: 20 },
-            errorMessage: "Country must be between 3 and 20 characters",
-        },
-        matches: {
-            options: /^[A-Za-z .'-]+$/,
-            errorMessage: "Country contains invalid characters",
-        },
+        ...isStringValidation('Country'),
+        ...isLengthValidation(3, 20, 'Country'),
+        ...matchesValidation(/^[A-Za-z .'-]+$/, "Country contains invalid characters"),
         trim: true, // Verwijder voor- en achterwaartse spaties
         escape: true, // Escape gevaarlijke tekens om XSS-aanvallen te voorkomen
     },
-    phone: {
+    Phone: {
+        ...isLengthValidation(10, 15, 'Phone number'),
         optional: true,
         customSanitizer: {
             options: (value) => {
@@ -241,20 +121,14 @@ export const updateUserValidationSchema = {
             options: ['nl-NL', 'de-DE'], // controleerd of telefoon nummer voldoet aan nl of de format
             errorMessage: "Invalid phone number format. Please enter a valid Dutch or German phone number.",
         },
-        isLength: {
-            options: { min: 10, max: 15 },
-            errorMessage: "Phone number should be between 10 and 15 digits",
-        },
     },
-    email: {
+    Email: {
         optional: true,
-        // Controleer of het e-mailadres een geldig formaat heeft
-        isEmail: {
-            errorMessage: "Invalid email format",
-        },
-        normalizeEmail: true, // Normaliseer het e-mailadres (bijv. zet alles om naar kleine letters)
-        trim: true, // Verwijder voor- en achterwaartse spaties
-        escape: true, // Escape gevaarlijke tekens
+        ...notEmptyValidation('Email'),
+        isEmail: { errorMessage: "Invalid email format" },
+        normalizeEmail: true,
+        trim: true,
+        escape: true,
     },
 };
 
@@ -264,15 +138,11 @@ export const updateUserValidationSchema = {
 export const filterValidationSchema = {
     filter: {
         optional: true,
-        notEmpty: {
-            errorMessage: "Filter cannot be empty",
-        },
+        ...notEmptyValidation('filter')
     },
     value: {
         optional: true,
-        notEmpty: {
-            errorMessage: "Value cannot be empty",
-        },
+        ...notEmptyValidation('value')
     },
 };
 
@@ -282,9 +152,7 @@ export const filterValidationSchema = {
 export const IDvalidatie = {
     id: {
         optional: false,
-        isInt: {
-            errorMessage: "ID moet een nummer zijn"
-        },
+        isInt: { errorMessage: "ID moet een nummer zijn"},
         trim: true,
         escape: true,
         toInt: true,
@@ -297,24 +165,16 @@ export const IDvalidatie = {
 export const BookingValidation = {
     Email: {
         optional: false,
-        isEmail: {
-            errorMessage: "Invalid email format",
-        },
-        notEmpty: {
-            errorMessage: "Email cannot be empty",
-        },
+        isEmail: {errorMessage: "Invalid email format",},
+        ...notEmptyValidation('email'),
         normalizeEmail: true,
         trim: true,
         escape: true,
     },
     NumberOfGuests: {
         optional: false,
-        isInt: {
-            errorMessage: "Number of Guests must be an integer",
-        },
-        notEmpty: {
-            errorMessage: "Number of Guests cannot be empty",
-        },
+        isInt: {errorMessage: "Number of Guests must be an integer",},
+        ...notEmptyValidation('Number of guests'),
         custom: {
             options: (value) => value >= 1 && value <= 8, // Controleer of het aantal gasten tussen 1 en 8 ligt
             errorMessage: "Number of Guests must be between 1 and 8",
@@ -322,16 +182,11 @@ export const BookingValidation = {
     },
     NumberOfKeycards: {
         optional: false,
-        isLength: {
-            options: { min: 1, max: 8 },
-            errorMessage: "Number of keycards cannot exceed 8",
-        },
+        ...isLengthValidation(1, 8, 'Number of keycards'),
         isInt: {
             errorMessage: "Number of Keycards must be an integer",
         },
-        notEmpty: {
-            errorMessage: "Number of Keycards cannot be empty",
-        },
+        ...notEmptyValidation('Number of keycards'),
         custom: {
             options: (value) => value >= 1 && value <= 8, // Controleer of het aantal gasten tussen 1 en 8 ligt
             errorMessage: "Number of keycards must be between 1 and 8",
@@ -346,9 +201,7 @@ export const BookingValidation = {
             options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
             errorMessage: "Moment Start must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
         },
-        notEmpty: {
-            errorMessage: "Moment Start cannot be empty",
-        },
+        ...notEmptyValidation('Moment start'),
         custom: {
             options: (value) => {
                 const momentStart = new Date(value);
@@ -366,9 +219,7 @@ export const BookingValidation = {
             options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
             errorMessage: "Moment End must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
         },
-        notEmpty: {
-            errorMessage: "Moment End cannot be empty",
-        },
+        ...notEmptyValidation('Moment end'),
         custom: {
             options: (value, { req }) => {
                 const momentStart = req.body.MomentStart ? new Date(req.body.MomentStart) : null;  // Controleren of MomentStart bestaat
@@ -416,20 +267,6 @@ export const BookingValidation = {
 };
 
 
-export const emailvalidator = {
-    Email: {
-        // Controleer of het e-mailadres een geldig formaat heeft
-        isEmail: {
-            errorMessage: "Invalid email format",
-        },
-        notEmpty: {
-            errorMessage: "Email cannot be empty",
-        },
-        normalizeEmail: true, // Normaliseer het e-mailadres (bijv. zet alles om naar kleine letters)
-        trim: true, // Verwijder voor- en achterwaartse spaties
-        escape: true, // Escape gevaarlijke tekens
-    },
-};
 
 export const categoryValidationSchema = {
     CategoryID: {
@@ -443,13 +280,8 @@ export const categoryValidationSchema = {
     },
     Name: {
         optional: false, // Verplicht veld
-        isString: {
-            errorMessage: "Naam moet een string zijn",
-        },
-        isLength: {
-            options: { min: 1, max: 100 },
-            errorMessage: "Naam moet tussen 1 en 100 tekens lang zijn",
-        },
+        ...isStringValidation('Name'),
+        ...isLengthValidation(1, 100, 'Name'),
         trim: true,
         escape: true,
     },
@@ -477,13 +309,8 @@ export const productValidationSchema = {
     },
     Name: {
         optional: false, // Verplicht veld
-        isString: {
-            errorMessage: "Naam moet een string zijn",
-        },
-        isLength: {
-            options: { min: 1, max: 100 },
-            errorMessage: "Naam moet tussen 1 en 100 tekens lang zijn",
-        },
+        ...isStringValidation('Name'),
+        ...isLengthValidation(1, 100, 'Name'),
         trim: true,
         escape: true,
     },
@@ -509,9 +336,7 @@ export const productValidationSchema = {
     },
     Size: {
         optional: false, // Verplicht veld
-        isString: {
-            errorMessage: "Grootte moet een string zijn",
-        },
+        ...isStringValidation('Size'),
         isLength: {
             options: { max: 10 },
             errorMessage: "Grootte mag maximaal 10 tekens bevatten",

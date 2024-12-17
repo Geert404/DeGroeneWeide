@@ -245,37 +245,43 @@ router.get('/api/users', checkSchema(filterValidationSchema), resultValidator, c
  */
 
 // POST request voor het aanmaken van een nieuwe gebruiker
-router.post('/api/users', userCreationLimiter, checkSchema(createuserValidationSchema), resultValidator, cors(corsOptions), async (request, response) => {
+router.post('/api/users',  checkSchema(createuserValidationSchema), resultValidator, cors(corsOptions), async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
-
     try {
         // Stap 1: Controleer of de e-mail van de nieuwe gebruiker al bestaat in de database
         // existingUser bevat de eerste gevonden gebruiker die voldoet aan data.email of undefined als er geen match is.
-        const [existingUser] = await pool.query(`SELECT * FROM users WHERE email = ?`, [data.email]); 
+        const [existingEmail] = await pool.query(`SELECT * FROM users WHERE Email = ?`, [data.Email]); 
 
         // Als de e-mail al bestaat, stuur dan een foutmelding terug
-        if (existingUser.length > 0) {
+        if (existingEmail.length > 0) {
             return response.status(400).send({ msg: "Email already exists" });
+        }
+
+        const [existingPhone] = await pool.query(`SELECT * FROM users WHERE Phone = ?`, [data.Phone]); 
+
+        // Als de e-mail al bestaat, stuur dan een foutmelding terug
+        if (existingPhone.length > 0) {
+            return response.status(400).send({ msg: "Phone number already exists" });
         }
 
         // Stap 2: Voeg de nieuwe gebruiker toe aan de database
         const [result] = await pool.query(
-            `INSERT INTO users (email, phone, firstname, lastname, housenumber, streetname, postalcode, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, // SQL query om een gebruiker toe te voegen
-            [data.email, data.phone, data.firstname, data.lastname, data.housenumber, data.streetname, data.postalcode, data.country,] // De waarden die in de query moeten worden ingevuld
+            `INSERT INTO users (Email, Phone, Firstname, Lastname, Housenumber, Streetname, Postalcode, Country) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, // SQL query om een gebruiker toe te voegen
+            [data.Email, data.Phone, data.Firstname, data.Lastname, data.Housenumber, data.Streetname, data.Postalcode, data.Country,] // De waarden die in de query moeten worden ingevuld
         );
 
         // Stap 3: Maak een object aan met de nieuwe gebruiker inclusief hun gegenereerde id
         const newUser = {
             id: result.insertId,  // Verkrijg het ID van de net ingevoegde gebruiker
-            email: data.email,
-            phone: data.phone,
-            firstname: data.firstname,
-            lastname: data.lastname,
-            housenumber: data.housenumber,
-            streetname: data.streetname,
-            postalcode: data.postalcode,
-            country: data.country,
+            email: data.Email,
+            phone: data.Phone,
+            firstname: data.Firstname,
+            lastname: data.Lastname,
+            housenumber: data.Housenumber,
+            streetname: data.Streetname,
+            postalcode: data.Postalcode,
+            country: data.Country,
         };
 
         // Stap 4: Stuur de nieuwe gebruiker als antwoord terug naar de client
@@ -372,7 +378,7 @@ router.get('/api/users/:id', checkSchema(IDvalidatie), resultValidator, cors(cor
 
     try {
         // SQL-query uitvoeren om gebruiker te zoeken
-        const [existingUser] = await pool.query('SELECT * FROM users WHERE userid = ?', [UserID]);
+        const [existingUser] = await pool.query('SELECT * FROM users WHERE Userid = ?', [UserID]);
 
         if (existingUser.length > 0) {
             return response.status(200).json(existingUser);
@@ -489,8 +495,8 @@ router.put ('/api/users/:id', checkSchema(createuserValidationSchema),  checkSch
     try {
         const [updatedUser] = await pool.query(
             `UPDATE users
-             SET email = ?, phone = ?, firstname = ?, lastname = ?, housenumber = ?, streetname = ?, postalcode = ?, country = ? WHERE userid = ?`, // SQL query om een gebruiker toe te voegen
-            [data.email, data.phone, data.firstname, data.lastname, data.housenumber, data.streetname, data.postalcode, data.country, UserID] // De waarden die in de query moeten worden ingevuld
+             SET Email = ?, Phone = ?, Firstname = ?, Lastname = ?, Housenumber = ?, Streetname = ?, Postalcode = ?, Country = ? WHERE UserID = ?`, // SQL query om een gebruiker toe te voegen
+            [data.Email, data.Phone, data.Firstname, data.Lastname, data.Housenumber, data.Streetname, data.Postalcode, data.Country, UserID] // De waarden die in de query moeten worden ingevuld
         );
         
         if (updatedUser.affectedRows === 0) {
@@ -606,7 +612,7 @@ router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkS
     const UserID = request.params.id;
 
     try {
-        const [existingUser] = await pool.query('SELECT * FROM users WHERE userid = ?', [UserID]);
+        const [existingUser] = await pool.query('SELECT * FROM users WHERE UserID = ?', [UserID]);
 
         if (existingUser.length === 0) {
             return response.status(404).send({msg: "User not found"}); 
@@ -617,37 +623,37 @@ router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkS
         const teUpdatenWaarden = [];
 
         // controleren van alle velden en waarden.
-        if(data.email){
-            teUpdatenVelden.push(`email = ?`);
-            teUpdatenWaarden.push(data.email);
+        if(data.Email){
+            teUpdatenVelden.push(`Email = ?`);
+            teUpdatenWaarden.push(data.Email);
         }
-        if(data.phone){
-            teUpdatenVelden.push(`phone = ?`);
-            teUpdatenWaarden.push(data.phone);
+        if(data.Phone){
+            teUpdatenVelden.push(`Phone = ?`);
+            teUpdatenWaarden.push(data.Phone);
         }
-        if(data.firstname){
-            teUpdatenVelden.push(`firstname = ?`);
-            teUpdatenWaarden.push(data.firstname);
+        if(data.Firstname){
+            teUpdatenVelden.push(`Firstname = ?`);
+            teUpdatenWaarden.push(data.Firstname);
         }
-        if(data.lastname){
-            teUpdatenVelden.push(`lastname = ?`);
-            teUpdatenWaarden.push(data.lastname);
+        if(data.Lastname){
+            teUpdatenVelden.push(`Lastname = ?`);
+            teUpdatenWaarden.push(data.Lastname);
         }
-        if(data.housenumber){
-            teUpdatenVelden.push(`housenumber = ?`);
-            teUpdatenWaarden.push(data.housenumber);
+        if(data.Housenumber){
+            teUpdatenVelden.push(`Housenumber = ?`);
+            teUpdatenWaarden.push(data.Housenumber);
         }
-        if(data.postalcode){
-            teUpdatenVelden.push(`postalcode = ?`);
-            teUpdatenWaarden.push(data.postalcode);
+        if(data.Postalcode){
+            teUpdatenVelden.push(`Postalcode = ?`);
+            teUpdatenWaarden.push(data.Postalcode);
         }
-        if(data.streetname){
-            teUpdatenVelden.push(`streetname = ?`);
-            teUpdatenWaarden.push(data.streetname);
+        if(data.Streetname){
+            teUpdatenVelden.push(`Streetname = ?`);
+            teUpdatenWaarden.push(data.Streetname);
         }
-        if(data.country){
-            teUpdatenVelden.push(`country = ?`);
-            teUpdatenWaarden.push(data.country);
+        if(data.Country){
+            teUpdatenVelden.push(`Country = ?`);
+            teUpdatenWaarden.push(data.Country);
         }
 
 
@@ -660,7 +666,7 @@ router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkS
 
         // Stap 1: Controleer of de e-mail van de nieuwe gebruiker al bestaat in de database
         // existingUser bevat de eerste gevonden gebruiker die voldoet aan data.email of undefined als er geen match is.
-        const [existingEmail] = await pool.query(`SELECT * FROM users WHERE email = ?`, [data.email]); 
+        const [existingEmail] = await pool.query(`SELECT * FROM users WHERE Email = ?`, [data.Email]); 
 
         // Als de e-mail al bestaat, stuur dan een foutmelding terug
         if (existingEmail.length > 0) {
@@ -670,7 +676,7 @@ router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkS
         //opstellen van de query
         const sqlQuery = `
             UPDATE users
-            SET ${teUpdatenVelden.join(', ')} WHERE userid = ?
+            SET ${teUpdatenVelden.join(', ')} WHERE UserID = ?
         `;
 
         //uitvoeren van de query
@@ -746,7 +752,7 @@ router.delete ('/api/users/:id', checkSchema(IDvalidatie), resultValidator, cors
     const UserID = data.id;
 
     try {
-        const [usercheck] = await pool.query('SELECT * FROM users Where userid = ?', [UserID]);
+        const [usercheck] = await pool.query('SELECT * FROM users Where UserID = ?', [UserID]);
         if (usercheck.length === 0){
             return response.status(404).send({msg: "user not found"})
         }
