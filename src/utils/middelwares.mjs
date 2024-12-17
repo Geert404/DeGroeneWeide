@@ -28,7 +28,12 @@ export const userCreationLimiter = rateLimit({
     message: 'Too many accounts created from this IP, please try again later',
 });
 
-
+export const corsOptions = {
+    origin: 'http://127.0.0.1:3000', // Specifieke frontend-domain
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Alleen GET en POST-methodes toestaan
+    allowedHeaders: ['Content-Type', 'Authorization'], // Toegestane headers
+    credentials: true, // Cookies toestaan
+};
 
 
 export const resultValidator = (request, response, next) => {

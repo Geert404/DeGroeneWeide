@@ -8,13 +8,8 @@ import passport from 'passport';
 import './strategies/local-strategies.mjs';
 import { swaggerDocs } from './swaggerConfig.mjs'; // Zorg ervoor dat het pad klopt
 import cors from 'cors'; // Vergeet niet om cors te importeren
+import { corsOptions } from './utils/middelwares.mjs';
 
-export const corsOptions = {
-    origin: 'http://127.0.0.1:3198', // Specifieke frontend-domain
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Alleen GET en POST-methodes toestaan
-    allowedHeaders: ['Content-Type', 'Authorization'], // Toegestane headers
-    credentials: true, // Cookies toestaan
-};
 // Maak een nieuwe Express-applicatie genaamd app
 const app = express();
 

@@ -3,6 +3,11 @@ import { checkSchema, matchedData, validationResult } from "express-validator";
 import pool from "../postgress/db.mjs";
 import { productValidationSchema, IDvalidatie, filterValidationSchema, productupdateValidationSchema } from "../utils/validationschemas.mjs";
 import { resultValidator } from "../utils/middelwares.mjs";
+import cors from 'cors';
+import { corsOptions } from "../utils/middelwares.mjs";
+
+
+
 
 const router = Router();
 
@@ -118,7 +123,7 @@ const router = Router();
  */
 
 
-router.post('/api/products', checkSchema(productValidationSchema), resultValidator, async (request, response) => {
+router.post('/api/products', checkSchema(productValidationSchema), resultValidator, cors(corsOptions), async (request, response) => {
     const data = matchedData(request); 
 
     try {
@@ -223,7 +228,7 @@ router.post('/api/products', checkSchema(productValidationSchema), resultValidat
  */
 
 
-router.get('/api/products', async (request, response) => {
+router.get('/api/products', cors(corsOptions), async (request, response) => {
     try {
         const [ophalenProducten] = await pool.query(`SELECT * FROM products`)
         if (ophalenProducten.length === 0){
@@ -322,7 +327,7 @@ router.get('/api/products', async (request, response) => {
  *                   example: 'Internal server error'
  */
 
-router.get('/api/products/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.get('/api/products/:id', checkSchema(IDvalidatie), resultValidator, cors(corsOptions), async (request, response) => {
     const data = matchedData(request); 
     const productID = data.id;
     
@@ -442,7 +447,7 @@ router.get('/api/products/:id', checkSchema(IDvalidatie), resultValidator, async
  */
 
 // put request 
-router.put ('/api/products/:id', checkSchema(productValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.put ('/api/products/:id', checkSchema(productValidationSchema),  checkSchema(IDvalidatie), resultValidator, cors(corsOptions), async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
     const ProductID = request.params.id;
@@ -580,7 +585,7 @@ router.put ('/api/products/:id', checkSchema(productValidationSchema),  checkSch
  */
 
 // patch request voor het aanpassen van een of meerdere gegevens in een bestand.
-router.patch ('/api/products/:id', checkSchema(productupdateValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.patch ('/api/products/:id', checkSchema(productupdateValidationSchema),  checkSchema(IDvalidatie), resultValidator, cors(corsOptions), async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
     const ProductID = request.params.id;
@@ -712,7 +717,7 @@ router.patch ('/api/products/:id', checkSchema(productupdateValidationSchema),  
  *                   example: 'Internal server error'
  */
 
-router.delete('/api/products/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.delete('/api/products/:id', checkSchema(IDvalidatie), resultValidator, cors(corsOptions), async (request, response) => {
     const data = matchedData(request);
     const productID = data.id;
     try {

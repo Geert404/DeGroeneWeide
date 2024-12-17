@@ -3,7 +3,8 @@ import { query, checkSchema, validationResult, body, matchedData } from "express
 import { filterValidationSchema, createuserValidationSchema, IDvalidatie, updateUserValidationSchema } from "../utils/validationschemas.mjs"
 import { resultValidator, userCreationLimiter} from "../utils/middelwares.mjs";
 import pool from "../postgress/db.mjs";
-
+import cors from 'cors';
+import { corsOptions } from "../utils/middelwares.mjs";
 
 
 
@@ -99,7 +100,7 @@ const router = Router();
  */
 
 // GET request voor het ophalen van alle gebruikers of met een filter.
-router.get('/api/users', checkSchema(filterValidationSchema), resultValidator, async (request, response) => {
+router.get('/api/users', checkSchema(filterValidationSchema), resultValidator, cors(corsOptions), async (request, response) => {
     const { query: { filter, value } } = request; // Haalt 'filter' en 'value' op uit de query parameters van de request
 
     try {
@@ -244,7 +245,7 @@ router.get('/api/users', checkSchema(filterValidationSchema), resultValidator, a
  */
 
 // POST request voor het aanmaken van een nieuwe gebruiker
-router.post('/api/users', userCreationLimiter, checkSchema(createuserValidationSchema), resultValidator, async (request, response) => {
+router.post('/api/users', userCreationLimiter, checkSchema(createuserValidationSchema), resultValidator, cors(corsOptions), async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
 
@@ -364,7 +365,7 @@ router.post('/api/users', userCreationLimiter, checkSchema(createuserValidationS
  */
 
 // Ophalen van users aan de hand van id
-router.get('/api/users/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.get('/api/users/:id', checkSchema(IDvalidatie), resultValidator, cors(corsOptions), async (request, response) => {
     // Gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
     const UserID = data.id;
@@ -480,7 +481,7 @@ router.get('/api/users/:id', checkSchema(IDvalidatie), resultValidator, async (r
  */
 
 // put request 
-router.put ('/api/users/:id', checkSchema(createuserValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.put ('/api/users/:id', checkSchema(createuserValidationSchema),  checkSchema(IDvalidatie), resultValidator, cors(corsOptions), async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
     const UserID = request.params.id;
@@ -599,7 +600,7 @@ router.put ('/api/users/:id', checkSchema(createuserValidationSchema),  checkSch
  */
 
 // patch request voor het aanpassen van een of meerdere gegevens in een bestand.
-router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkSchema(IDvalidatie), resultValidator, cors(corsOptions), async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
     const UserID = request.params.id;
@@ -740,7 +741,7 @@ router.patch ('/api/users/:id', checkSchema(updateUserValidationSchema),  checkS
  */
 
 // delete request voor het verwijderen van een user in dit geval.
-router.delete ('/api/users/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.delete ('/api/users/:id', checkSchema(IDvalidatie), resultValidator, cors(corsOptions), async (request, response) => {
     const data = matchedData(request); 
     const UserID = data.id;
 

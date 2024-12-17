@@ -3,7 +3,8 @@ import { query, checkSchema, validationResult, body, matchedData } from "express
 import { filterValidationSchema, createuserValidationSchema, IDvalidatie, updateUserValidationSchema } from "../utils/validationschemas.mjs"
 import { userCreationLimiter} from "../utils/middelwares.mjs";
 import pool from "../postgress/db.mjs";
-
+import cors from 'cors';
+import { corsOptions } from "../utils/middelwares.mjs";
 
 
 

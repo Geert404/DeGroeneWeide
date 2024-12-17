@@ -4,7 +4,8 @@ import { filterValidationSchema, createuserValidationSchema, IDvalidatie, update
 import { resultValidator, userCreationLimiter} from "../utils/middelwares.mjs";
 import pool from "../postgress/db.mjs";
 import { mapBookingData } from "../utils/response.mjs";
-
+import cors from 'cors';
+import { corsOptions } from "../utils/middelwares.mjs";
 
 
 
@@ -139,7 +140,7 @@ const router = Router();
  *                   example: Server error
  */
 
-router.post('/api/bookings/', checkSchema(BookingValidation), resultValidator, async (request, response) => {
+router.post('/api/bookings/', checkSchema(BookingValidation), resultValidator, cors(corsOptions), async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
 
@@ -294,7 +295,7 @@ router.post('/api/bookings/', checkSchema(BookingValidation), resultValidator, a
  *                   example: Server error
  */
 
-router.get('/api/bookings',checkSchema(emailvalidator), resultValidator, async (request, response) => {
+router.get('/api/bookings',checkSchema(emailvalidator), resultValidator, cors(corsOptions), async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request);
 
@@ -381,7 +382,7 @@ router.get('/api/bookings',checkSchema(emailvalidator), resultValidator, async (
  *                   example: Server error
  */
 
-router.delete('/api/bookings/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.delete('/api/bookings/:id', checkSchema(IDvalidatie), resultValidator, cors(corsOptions), async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request);
     const BookingID = data.id;

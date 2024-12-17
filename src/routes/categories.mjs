@@ -4,10 +4,10 @@ import pool from "../postgress/db.mjs";
 import { categoryValidationSchema, IDvalidatie } from "../utils/validationschemas.mjs";
 import { resultValidator } from "../utils/middelwares.mjs";
 import cors from 'cors';
-import { corsOptions } from "../index.mjs";
+import { corsOptions } from "../utils/middelwares.mjs";
 
 const router = Router();
-router.use(cors(corsOptions));
+
 
 /**
  * @swagger
@@ -69,7 +69,7 @@ router.use(cors(corsOptions));
  *                   example: 'Internal server error'
  */
 
-router.post('/api/categories', checkSchema(categoryValidationSchema), resultValidator, async (request, response) => {
+router.post('/api/categories', checkSchema(categoryValidationSchema), cors(corsOptions), resultValidator, async (request, response) => {
     const data = matchedData(request); 
 
     try {
@@ -145,7 +145,7 @@ router.post('/api/categories', checkSchema(categoryValidationSchema), resultVali
  */
 
 
-router.get('/api/categories', cors(corsOptions), async (request, response) => {
+router.get('/api/categories', cors(corsOptions), cors(corsOptions), async (request, response) => {
     try {
         const [ophalencategoryProducten] = await pool.query(`SELECT * FROM product_categories`);
         if (ophalencategoryProducten.length === 0) {
@@ -246,7 +246,7 @@ router.get('/api/categories', cors(corsOptions), async (request, response) => {
  *                   example: 'Internal server error'
  */
 
-router.get('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.get('/api/categories/:id', checkSchema(IDvalidatie), cors(corsOptions), resultValidator, async (request, response) => {
     const data = matchedData(request); 
     const categoryID = data.id;
     
@@ -325,7 +325,7 @@ router.get('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, asy
  *                   example: 'Server error'
  */
 
-router.delete('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.delete('/api/categories/:id', checkSchema(IDvalidatie), cors(corsOptions), resultValidator, async (request, response) => {
     const data = matchedData(request);
     const categoryID = data.id;
 
@@ -418,7 +418,7 @@ router.delete('/api/categories/:id', checkSchema(IDvalidatie), resultValidator, 
  */
 
 // put request 
-router.put ('/api/categories/:id', checkSchema(categoryValidationSchema),  checkSchema(IDvalidatie), resultValidator, async (request, response) => {
+router.put ('/api/categories/:id', checkSchema(categoryValidationSchema), cors(corsOptions), checkSchema(IDvalidatie), resultValidator, async (request, response) => {
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request); 
     const CategoryID = request.params.id;
