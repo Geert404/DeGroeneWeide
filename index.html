@@ -2,16 +2,17 @@
 <html>
   <head>
     <link rel="stylesheet" href="index.css"/>
-    <script src="index.js"></script> 
+    
   </head>
   <body>
+    
     <template id="ingredient-kaart">
       <link rel="stylesheet" href="index.css"/>
       <!-- Hoofd container van de ingredienten kaart -->
       
-      <div class= "ingredient-container">
-        <div class="ingredient-foto">
-          <img src="images/Placeholder.jpg">
+      <div class= "ingredient-container" id="kaart">
+        <div class="ingredient-foto-container">
+          <img class="ingredient-foto" src="images/Placeholder.jpg">
           <!--Prijs en aantal-->
           <div class="prijs-en-aantal">
             <p class="prijs">4.<span class="prijs-cent">99</span></p>
@@ -28,7 +29,7 @@
           </div>
         </div>
         <div class="uitklap-en-voorraad">
-          <div>
+          <div class="uitklap-container">
             <img class="uitklap-icon" src="Icons/Expand-icon.svg">
           </div>
           <p class="voorraad">voorraad: <span>15</span></p>
@@ -37,10 +38,7 @@
       </div>
     </template>
     <ingredient-kaart></ingredient-kaart>
-    <ingredient-kaart></ingredient-kaart>
-    <div id="parent">
-
-    </div>
-      
+    <button type="button" id="button">expand</button>
+    <script src="index.js" async></script> 
   </body>
 </html>
