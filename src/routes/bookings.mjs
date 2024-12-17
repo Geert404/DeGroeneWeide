@@ -386,7 +386,6 @@ router.delete('/api/bookings/:id', checkSchema(IDvalidatie), resultValidator, co
     // gevalideerde data wordt opgeslagen in data variabelen
     const data = matchedData(request);
     const BookingID = data.id;
-    console.log(BookingID);
 try {
     const [checkenBooking] = await pool.query(`SELECT * FROM bookings WHERE BookingID = ?`, [BookingID]);
     if (checkenBooking.length === 0){
