@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { query, checkSchema, validationResult, body, matchedData } from "express-validator";
-import { filterValidationSchema, createuserValidationSchema, IDvalidatie, updateUserValidationSchema, BookingValidation, emailvalidator } from "../utils/validationschemas.mjs"
+import { IDvalidatie, BookingValidation, emailvalidator } from "../utils/validationschemas.mjs"
 import { resultValidator, userCreationLimiter} from "../utils/middelwares.mjs";
 import pool from "../postgress/db.mjs";
 import { mapBookingData } from "../utils/response.mjs";
@@ -328,9 +328,6 @@ router.get('/api/bookings',checkSchema(emailvalidator), resultValidator, cors(co
     }
 
 });
-
-
-
 
 /**
  * @swagger

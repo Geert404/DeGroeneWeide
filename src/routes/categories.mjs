@@ -145,7 +145,7 @@ router.post('/api/categories', checkSchema(categoryValidationSchema), cors(corsO
  */
 
 
-router.get('/api/categories', cors(corsOptions), cors(corsOptions), async (request, response) => {
+router.get('/api/categories', cors(corsOptions), async (request, response) => {
     try {
         const [ophalencategoryProducten] = await pool.query(`SELECT * FROM product_categories`);
         if (ophalencategoryProducten.length === 0) {

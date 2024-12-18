@@ -104,7 +104,7 @@ router.get('/api/users', checkSchema(filterValidationSchema), resultValidator, c
     const { query: { filter, value } } = request; // Haalt 'filter' en 'value' op uit de query parameters van de request
 
     try {
-        const allowedFilters = ['email', 'phone', 'lastname', 'firstname', 'country', 'postalcode', 'housenumber']; // Lijst van toegestane filters
+        const allowedFilters = ['Email', 'Phone', 'Lastname', 'Firstname', 'Country', 'Postalcode', 'Housenumber']; // Lijst van toegestane filters
 
         // Controleer of het filter geldig is
         if (filter && !allowedFilters.includes(filter)) {

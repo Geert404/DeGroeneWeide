@@ -422,3 +422,89 @@ export const productupdateValidationSchema = {
         toInt: true,
     },
 };
+
+
+
+export const LockerValidation = {
+    LockerID: {
+        optional: false,
+        isInt:{
+            errorMessage: "Locker ID moet een nummer zijn",
+        },
+        trim: true,
+        toInt: true,
+    },
+    BookingID:{
+        optional: false,
+        isInt: {
+            errorMessage: "Booking id moet een integer zijn",
+        },
+    },
+    MomentDelivered: {
+        ...notEmptyValidation('Moment delivered'),
+        optional: true,
+        isString: {
+            errorMessage: "Moment delivered must be a valid string",
+        },
+        matches: {
+            options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
+            errorMessage: "Moment delivered must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
+        },
+    },
+};
+
+
+
+export const UpdateLockerValidation = {
+    BookingID:{
+        ...notEmptyValidation('Booking id'),
+        optional: false,
+        isInt: {
+            errorMessage: "Booking id moet een integer zijn",
+        },
+        toInt: true,
+    },
+    MomentDelivered: {
+        ...notEmptyValidation('Moment delivered'),
+        optional: false,
+        isString: {
+            errorMessage: "Moment delivered must be a valid string",
+        },
+        matches: {
+            options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
+            errorMessage: "Moment delivered must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
+        },
+    },
+};
+
+
+export const UpdateLockerpatchValidation = {
+    LockerID: {
+        optional: true,
+        isInt:{
+            errorMessage: "Locker ID moet een nummer zijn",
+        },
+        ...notEmptyValidation('Locker id '),
+        trim: true,
+        toInt: true,
+    },
+    BookingID:{
+        ...notEmptyValidation('Booking id'),
+        optional: true,
+        isInt: {
+            errorMessage: "Booking id moet een integer zijn",
+        },
+        toInt: true,
+    },
+    MomentDelivered: {
+        ...notEmptyValidation('Moment delivered'),
+        optional: true,
+        isString: {
+            errorMessage: "Moment delivered must be a valid string",
+        },
+        matches: {
+            options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
+            errorMessage: "Moment delivered must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
+        },
+    },
+};
