@@ -488,14 +488,6 @@ export const UpdateLockerpatchValidation = {
         trim: true,
         toInt: true,
     },
-    BookingID:{
-        ...notEmptyValidation('Booking id'),
-        optional: true,
-        isInt: {
-            errorMessage: "Booking id moet een integer zijn",
-        },
-        toInt: true,
-    },
     MomentDelivered: {
         ...notEmptyValidation('Moment delivered'),
         optional: true,
@@ -506,5 +498,67 @@ export const UpdateLockerpatchValidation = {
             options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
             errorMessage: "Moment delivered must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
         },
+    },
+};
+
+
+export const createorderdProductValidation = {
+    ProductID:{
+        optional: false,
+        isInt:{
+            errorMessage: "Product ID moet een nummer zijn",
+        },
+        ...notEmptyValidation('Product id '),
+        trim: true,
+        toInt: true,
+    },
+    OrderID: {
+        optional: false,
+        isInt:{
+            errorMessage: "Order ID moet een nummer zijn",
+        },
+        ...notEmptyValidation('Order id '),
+        trim: true,
+        toInt: true,
+    },
+    Amount:{
+        optional: false,
+        isInt:{
+            errorMessage: "Amount moet een nummer zijn",
+        },
+        ...notEmptyValidation('Amount id '),
+        trim: true,
+        toInt: true,
+    },
+};
+
+
+export const updateorderdProductValidation = {
+    ProductID:{
+        optional: true,
+        isInt:{
+            errorMessage: "Product ID moet een nummer zijn",
+        },
+        ...notEmptyValidation('Product id '),
+        trim: true,
+        toInt: true,
+    },
+    OrderID: {
+        optional: true,
+        isInt:{
+            errorMessage: "Order ID moet een nummer zijn",
+        },
+        ...notEmptyValidation('Order id '),
+        trim: true,
+        toInt: true,
+    },
+    Amount:{
+        optional: true,
+        isInt:{
+            errorMessage: "Amount moet een nummer zijn",
+        },
+        ...notEmptyValidation('Amount id '),
+        trim: true,
+        toInt: true,
     },
 };

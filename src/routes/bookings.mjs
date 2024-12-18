@@ -329,6 +329,9 @@ router.get('/api/bookings',checkSchema(emailvalidator), resultValidator, cors(co
 
 });
 
+
+
+
 /**
  * @swagger
  * /api/bookings/{id}:
