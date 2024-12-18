@@ -21,7 +21,7 @@
           
         </div >
         <!--Bestelknop met titel-->
-        <div class="bestel-knop-en-titel">
+        <div class="bestel-knop-en-titel" id="omschrijving">
           <p>Wagyu</p>
           <!-- Bestel knop-->
           <div class="bestel-knop-container-small">
@@ -29,12 +29,11 @@
           </div>
         </div>
         <div class="uitklap-en-voorraad">
-          <div class="uitklap-container">
-            <img class="uitklap-icon" src="Icons/Expand-icon.svg">
+          <div class="uitklap-container" onclick="uitklap()">
+            <img  class="uitklap-icon" src="Icons/Expand-icon.svg">
           </div>
           <p class="voorraad">voorraad: <span>15</span></p>
         </div>
-
       </div>
     </template>
     <ingredient-kaart></ingredient-kaart>
