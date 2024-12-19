@@ -562,3 +562,129 @@ export const updateorderdProductValidation = {
         toInt: true,
     },
 };
+
+
+export const createOrderValidation = {
+    BookingID:{
+        ...notEmptyValidation('Booking id'),
+        optional: false,
+        isInt: {
+            errorMessage: "Booking id moet een integer zijn",
+        },
+        toInt: true,
+    },
+    LockerID: {
+        optional: false,
+        isInt:{
+            errorMessage: "Locker ID moet een nummer zijn",
+        },
+        ...notEmptyValidation('Locker id '),
+        trim: true,
+        toInt: true,
+    },
+    Price: {
+        optional: false, // Verplicht veld
+        isInt: {
+            options: { min: 0 },
+            errorMessage: "Prijs moet een positief geheel getal zijn",
+        },
+        trim: true,
+        toInt: true,
+    },
+    MomentCreated: {
+        ...notEmptyValidation('Moment created'),
+        optional: false,
+        isString: {
+            errorMessage: "Moment created must be a valid string",
+        },
+        matches: {
+            options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
+            errorMessage: "Moment created must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
+        },
+    },
+    MomentDelivered: {
+        ...notEmptyValidation('Moment delivered'),
+        optional: true,
+        isString: {
+            errorMessage: "Moment delivered must be a valid string",
+        },
+        matches: {
+            options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
+            errorMessage: "Moment delivered must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
+        },
+    },
+    MomentGathered: {
+        ...notEmptyValidation('Moment gathered'),
+        optional: true,
+        isString: {
+            errorMessage: "Moment gathered must be a valid string",
+        },
+        matches: {
+            options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
+            errorMessage: "Moment gathered must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
+        },
+    },
+};
+
+export const patchOrdersValidation = {
+    BookingID:{
+        ...notEmptyValidation('Booking id'),
+        optional: true,
+        isInt: {
+            errorMessage: "Booking id moet een integer zijn",
+        },
+        toInt: true,
+    },
+    LockerID: {
+        optional: true,
+        isInt:{
+            errorMessage: "Locker ID moet een nummer zijn",
+        },
+        ...notEmptyValidation('Locker id '),
+        trim: true,
+        toInt: true,
+    },
+    Price: {
+        optional: true, // Verplicht veld
+        isInt: {
+            options: { min: 0 },
+            errorMessage: "Prijs moet een positief geheel getal zijn",
+        },
+        trim: true,
+        toInt: true,
+    },
+    MomentCreated: {
+        ...notEmptyValidation('Moment created'),
+        optional: true,
+        isString: {
+            errorMessage: "Moment created must be a valid string",
+        },
+        matches: {
+            options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
+            errorMessage: "Moment created must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
+        },
+    },
+    MomentDelivered: {
+        ...notEmptyValidation('Moment delivered'),
+        optional: true,
+        isString: {
+            errorMessage: "Moment delivered must be a valid string",
+        },
+        matches: {
+            options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
+            errorMessage: "Moment delivered must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
+        },
+    },
+    MomentGathered: {
+        ...notEmptyValidation('Moment gathered'),
+        optional: true,
+        isString: {
+            errorMessage: "Moment gathered must be a valid string",
+        },
+        matches: {
+            options: [/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/],
+            errorMessage: "Moment gathered must be in MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)",
+        },
+    },
+    
+};
